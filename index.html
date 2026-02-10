@@ -635,13 +635,13 @@
                 skullModel = object;
 
                 // Ajuste de posição e escala
-                // Como modelos OBJ variam muito de tamanho, talvez você precise ajustar o scale
-                skullModel.scale.set(0.4, 0.4, 0.4);
-                skullModel.position.set(12, 6, -10); // Posicionada um pouco afastada dos planetas
+                skullModel.scale.set(0.1, 0.1, 0.1);
+                // Posicionada um pouco afastada dos planetas
+                skullModel.position.set(12, 6, -10); 
 
                 scene.add(skullModel);
 
-                // Adicionar um brilho sutil atrás da caveira também
+                // Adicionar um brilho sutil atrás da caveira
                 const skullGlowGeo = new THREE.SphereGeometry(2, 32, 32);
                 const skullGlowMat = new THREE.MeshBasicMaterial({
                     color: 0xffffff,

@@ -133,6 +133,13 @@
             object-fit: cover;
         }
 
+        .profile-social-link img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+        }
+
+
         .profile-card__name {
             font-family: 'Playfair Display', serif;
             font-size: 2rem;
@@ -235,14 +242,14 @@
             height: 0;
             border-radius: 50%;
             background: #e2d1b1;
-            transition: width 0.4s ease, height 0.4s ease;
+            transition: width 0.8s ease, height 0.8s ease;
             transform: translate(-50%, -50%);
             z-index: -1;
         }
 
         .explore-button:hover::before {
-            width: 300px;
-            height: 300px;
+            width: 400px;
+            height: 400px;
         }
 
         .explore-button:hover {
@@ -421,26 +428,38 @@
                 </p>
                 <div class="profile-card__social">
                     <a href="https://mail.google.com/mail/?view=cm&to=enriqueabyss@gmail.com" target="_blank"
-                        rel="noopener noreferrer" class="profile-social-link" title="Email">✉️</a>
-                    <a href="https://github.com/enrique-ss" target="_blank" rel="noopener noreferrer"
-                        class="profile-social-link" title="GitHub">💻</a>
+                        rel="noopener noreferrer" class="profile-social-link" title="Email">
+                        <img src="./resources/gmail.png" alt="Email">
+                    </a>
+                    <a href="https://github.com/enrique-ss" target="_blank" rel="noopener noreferrer" class="profile-social-link"
+                        title="GitHub">
+                        <img src="./resources/github.png" alt="GitHub">
+                    </a>
                     <a href="https://www.linkedin.com/in/luiz-enrique-ss/" target="_blank" rel="noopener noreferrer"
-                        class="profile-social-link" title="LinkedIn">🔗</a>
+                        class="profile-social-link" title="LinkedIn">
+                        <img src="./resources/linkedin.png" alt="LinkedIn">
+                    </a>
                 </div>
                 <button class="explore-button" id="explore-btn">Explorar</button>
             </div>
-
+            
             <!-- VERSO DO CARD (SECRETO) -->
             <div class="card-face card-back">
                 <h2 class="secret-title">Informações Secretas</h2>
                 <p class="secret-subtitle">Meus Perfis de Gaming</p>
                 <div class="profile-card__social">
                     <a href="https://steamcommunity.com/id/canecote/" target="_blank" rel="noopener noreferrer"
-                        class="profile-social-link" title="Steam">🎮</a>
+                        class="profile-social-link" title="Steam">
+                        <img src="./resources/steam.png" alt="Steam">
+                    </a>
                     <a href="https://psnprofiles.com/va-jhin-na" target="_blank" rel="noopener noreferrer"
-                        class="profile-social-link" title="PlayStation">🎯</a>
+                        class="profile-social-link" title="PlayStation">
+                        <img src="./resources/playstation.png" alt="PlayStation">
+                    </a>
                     <a href="https://discord.com/users/luiz.enrique" target="_blank" rel="noopener noreferrer"
-                        class="profile-social-link" title="Discord">💬</a>
+                        class="profile-social-link" title="Discord">
+                        <img src="./resources/discord.png" alt="Discord">
+                    </a>
                 </div>
                 <p class="profile-card__bio" style="margin-top: 20px;">
                     Quando não estou codando, você pode me encontrar explorando mundos virtuais, conquistando troféus ou
@@ -448,6 +467,7 @@
                 </p>
                 <button class="explore-button" id="explore-btn-back">Explorar Portfólio</button>
             </div>
+
         </div>
     </div>
 
@@ -478,6 +498,8 @@
 
     <!-- Bibliotecas externas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/MTLLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
     <script>
@@ -595,6 +617,45 @@
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
         let hoveredModule = null;
+
+        /* ========================================
+       CARREGAMENTO DA CAVEIRA 3D
+    ======================================== */
+            let skullModel = null;
+
+            const mtlLoader = new THREE.MTLLoader();
+            mtlLoader.setPath('resources/skull/');
+            mtlLoader.load('skull.mtl', (materials) => {
+                materials.preload();
+
+            const objLoader = new THREE.OBJLoader();
+            objLoader.setMaterials(materials);
+            objLoader.setPath('resources/skull/');
+            objLoader.load('skull.obj', (object) => {
+                skullModel = object;
+
+                // Ajuste de posição e escala
+                // Como modelos OBJ variam muito de tamanho, talvez você precise ajustar o scale
+                skullModel.scale.set(0.4, 0.4, 0.4);
+                skullModel.position.set(12, 6, -10); // Posicionada um pouco afastada dos planetas
+
+                scene.add(skullModel);
+
+                // Adicionar um brilho sutil atrás da caveira também
+                const skullGlowGeo = new THREE.SphereGeometry(2, 32, 32);
+                const skullGlowMat = new THREE.MeshBasicMaterial({
+                    color: 0xffffff,
+                    transparent: true,
+                    opacity: 0.05
+                });
+                const skullGlow = new THREE.Mesh(skullGlowGeo, skullGlowMat);
+                skullModel.add(skullGlow);
+
+            },
+                (xhr) => { console.log((xhr.loaded / xhr.total * 100) + '% carregado'); },
+                (error) => { console.error('Erro ao carregar a caveira:', error); }
+            );
+        });
 
         modules.forEach((module, index) => {
             // Geometria principal do módulo (icosaedro wireframe)
@@ -894,6 +955,20 @@
             if (!isExperienceStarted) {
                 profileCard.style.transform = `rotateY(${rotation.y * 100}deg) rotateX(${-rotation.x * 100}deg)`;
             }
+
+            if (skullModel) {
+                const time = Date.now() * 0.001;
+
+                // Rotação lenta e constante
+                skullModel.rotation.y += 0.005;
+                skullModel.rotation.z += 0.002;
+
+                // Movimento de flutuação (Seno e Cosseno para suavidade)
+                skullModel.position.y += Math.sin(time) * 0.005;
+                skullModel.position.x += Math.cos(time * 0.5) * 0.002;
+                skullModel.position.z += Math.sin(time * 0.7) * 0.002;
+            }
+
 
             // Aplicar rotação à cena
             scene.rotation.y = rotation.y;

@@ -8,7 +8,11 @@
     <link
         href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;1,700&display=swap"
         rel="stylesheet">
+
     <style>
+        /* ========================================
+           ESTILOS GLOBAIS
+        ======================================== */
         * {
             margin: 0;
             padding: 0;
@@ -23,6 +27,7 @@
             cursor: crosshair;
         }
 
+        /* Canvas do Three.js fica fixo no fundo */
         canvas {
             position: fixed;
             top: 0;
@@ -30,6 +35,9 @@
             z-index: 1;
         }
 
+        /* ========================================
+           OVERLAY ESCURO INICIAL
+        ======================================== */
         #profile-overlay {
             position: fixed;
             top: 0;
@@ -47,7 +55,9 @@
             opacity: 0;
         }
 
-        /* Card Container com CSS 3D */
+        /* ========================================
+           CARD DE PERFIL 3D
+        ======================================== */
         #profile-card-container {
             position: fixed;
             top: 50%;
@@ -60,10 +70,18 @@
             opacity: 1;
             transition: opacity 0.5s ease;
             pointer-events: none;
+            /* Permite arrastar através do card */
         }
 
         #profile-card-container.hidden {
             opacity: 0;
+            display: none;
+            /* Remove completamente do fluxo */
+        }
+
+        /* Desabilitar completamente os elementos quando o card está escondido */
+        #profile-card-container.hidden * {
+            pointer-events: none !important;
         }
 
         #profile-card {
@@ -73,6 +91,7 @@
             transition: transform 0.1s linear;
         }
 
+        /* Face do card (frente e verso) */
         .card-face {
             position: relative;
             width: 100%;
@@ -94,6 +113,7 @@
             z-index: 2;
         }
 
+        /* Verso do card (rotacionado 180°) */
         .card-back {
             position: absolute;
             top: 0;
@@ -101,6 +121,9 @@
             transform: rotateY(180deg);
         }
 
+        /* ========================================
+           ELEMENTOS DO CARD
+        ======================================== */
         .profile-card__image {
             width: 120px;
             height: 120px;
@@ -132,6 +155,7 @@
             margin-bottom: 25px;
         }
 
+        /* Container dos ícones sociais */
         .profile-card__social {
             display: flex;
             justify-content: center;
@@ -140,6 +164,7 @@
             flex-wrap: wrap;
         }
 
+        /* Links dos ícones sociais - têm pointer-events para serem clicáveis */
         .profile-social-link {
             width: 50px;
             height: 50px;
@@ -161,6 +186,9 @@
             transform: translateY(-3px);
         }
 
+        /* ========================================
+           VERSO SECRETO DO CARD
+        ======================================== */
         .secret-title {
             font-family: 'Playfair Display', serif;
             font-size: 1.8rem;
@@ -176,6 +204,9 @@
             letter-spacing: 2px;
         }
 
+        /* ========================================
+           BOTÃO EXPLORAR
+        ======================================== */
         .explore-button {
             padding: 15px 50px;
             background: transparent;
@@ -194,6 +225,7 @@
             pointer-events: auto;
         }
 
+        /* Efeito de preenchimento ao hover */
         .explore-button::before {
             content: '';
             position: absolute;
@@ -219,6 +251,9 @@
             box-shadow: 0 0 30px rgba(226, 209, 177, 0.5);
         }
 
+        /* ========================================
+           HUD (INFORMAÇÕES NO CANTO SUPERIOR)
+        ======================================== */
         #hud {
             position: fixed;
             top: 20px;
@@ -239,6 +274,9 @@
             letter-spacing: 1px;
         }
 
+        /* ========================================
+           PAINEL DE INFORMAÇÕES DO MÓDULO
+        ======================================== */
         #info-panel {
             position: fixed;
             bottom: 40px;
@@ -287,6 +325,9 @@
             text-align: center;
         }
 
+        /* ========================================
+           DICAS DE NAVEGAÇÃO
+        ======================================== */
         #nav-hint {
             position: fixed;
             top: 50%;
@@ -308,6 +349,9 @@
             margin: 10px 0;
         }
 
+        /* ========================================
+           ANIMAÇÕES
+        ======================================== */
         .status-dot {
             display: inline-block;
             width: 6px;
@@ -332,6 +376,9 @@
             }
         }
 
+        /* ========================================
+           RESPONSIVIDADE
+        ======================================== */
         @media (max-width: 768px) {
             #info-panel {
                 width: 90%;
@@ -355,10 +402,13 @@
 </head>
 
 <body>
+    <!-- Overlay escuro inicial -->
     <div id="profile-overlay"></div>
 
+    <!-- Container do card de perfil 3D -->
     <div id="profile-card-container">
         <div id="profile-card">
+
             <!-- FRENTE DO CARD -->
             <div class="card-face card-front">
                 <img class="profile-card__image" src="./resources/images.png" alt="Foto de perfil">
@@ -366,8 +416,8 @@
                 <p class="profile-card__role">Dev Full-Stack & Professor</p>
                 <p class="profile-card__bio">
                     Estudante de Licenciatura em Computação no IFSul. Apaixonado por ensinar e desenvolver soluções
-                    criativas.
-                    Meu código aberto reflete minha filosofia: aprender para ensinar e ensinar para acessibilizar.
+                    criativas. Meu código aberto reflete minha filosofia: aprender para ensinar e ensinar para
+                    acessibilizar.
                 </p>
                 <div class="profile-card__social">
                     <a href="https://mail.google.com/mail/?view=cm&to=enriqueabyss@gmail.com" target="_blank"
@@ -382,35 +432,26 @@
 
             <!-- VERSO DO CARD (SECRETO) -->
             <div class="card-face card-back">
-                <h2 class="secret-title">🎮 Informações Secretas</h2>
+                <h2 class="secret-title">Informações Secretas</h2>
                 <p class="secret-subtitle">Meus Perfis de Gaming</p>
                 <div class="profile-card__social">
-                    <a href="https://steamcommunity.com/id/enriqueabyss/" target="_blank" rel="noopener noreferrer"
-                        class="profile-social-link" title="Steam">
-                        🎮
-                    </a>
-                    <a href="https://psnprofiles.com/enriqueabyss" target="_blank" rel="noopener noreferrer"
-                        class="profile-social-link" title="PlayStation">
-                        🎯
-                    </a>
-                    <a href="https://discord.com/users/enriqueabyss" target="_blank" rel="noopener noreferrer"
-                        class="profile-social-link" title="Discord">
-                        💬
-                    </a>
-                    <a href="https://www.twitch.tv/enriqueabyss" target="_blank" rel="noopener noreferrer"
-                        class="profile-social-link" title="Twitch">
-                        📺
-                    </a>
+                    <a href="https://steamcommunity.com/id/canecote/" target="_blank" rel="noopener noreferrer"
+                        class="profile-social-link" title="Steam">🎮</a>
+                    <a href="https://psnprofiles.com/va-jhin-na" target="_blank" rel="noopener noreferrer"
+                        class="profile-social-link" title="PlayStation">🎯</a>
+                    <a href="https://discord.com/users/luiz.enrique" target="_blank" rel="noopener noreferrer"
+                        class="profile-social-link" title="Discord">💬</a>
                 </div>
                 <p class="profile-card__bio" style="margin-top: 20px;">
-                    Quando não estou codando, você me encontra explorando mundos virtuais, conquistando troféus ou
-                    conversando sobre tecnologia e games no Discord.
+                    Quando não estou codando, você pode me encontrar explorando mundos virtuais, conquistando troféus ou
+                    conversando no Discord.
                 </p>
                 <button class="explore-button" id="explore-btn-back">Explorar Portfólio</button>
             </div>
         </div>
     </div>
 
+    <!-- HUD com informações do sistema -->
     <div id="hud">
         <div class="hud-line">PORTFÓLIO ESPACIAL v1.0</div>
         <div class="hud-line">SEÇÕES: <span id="module-count">3</span></div>
@@ -419,12 +460,15 @@
         <div class="hud-line">CAM: <span id="cam-distance">15.0</span></div>
     </div>
 
+    <!-- Dicas de navegação -->
     <div id="nav-hint">
+        <div class="hint-line">ESC → VOLTAR</div>
         <div class="hint-line">ARRASTE → ROTACIONAR</div>
         <div class="hint-line">SCROLL → ZOOM</div>
         <div class="hint-line">CLIQUE → ACESSAR</div>
     </div>
 
+    <!-- Painel de informações do módulo (aparece ao passar o mouse) -->
     <div id="info-panel">
         <h2 class="info-title" id="info-title">Module Name</h2>
         <div class="info-filename" id="info-filename">filename.ext</div>
@@ -432,76 +476,196 @@
         <div class="info-action">CLIQUE PARA ACESSAR</div>
     </div>
 
+    <!-- Bibliotecas externas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
     <script>
+        /* ========================================
+           CONFIGURAÇÃO DOS MÓDULOS (SEÇÕES DO PORTFÓLIO)
+        ======================================== */
         const modules = [
-            { name: 'Formação', filename: 'education.db', description: 'Minha jornada acadêmica: Licenciatura em Computação, cursos complementares e certificações que moldaram meu conhecimento.', url: 'formacao.html', position: { x: -8, y: 4, z: -3 }, color: 0x4ecca3 },
-            { name: 'Experiências', filename: 'experience.log', description: 'Projetos profissionais, trabalhos desenvolvidos e experiências que contribuíram para minha formação como desenvolvedor.', url: 'experiencias.html', position: { x: 7, y: -3, z: 5 }, color: 0xff6b9d },
-            { name: 'Projetos', filename: 'projects.json', description: 'Portfólio completo de aplicações web, sistemas e experimentos criativos desenvolvidos ao longo da minha jornada.', url: 'projetos.html', position: { x: -5, y: -5, z: 8 }, color: 0xfbbf24 }
+            {
+                name: 'Formação',
+                filename: 'education.db',
+                description: 'Minha jornada acadêmica: Licenciatura em Computação, cursos complementares e certificações que moldaram meu conhecimento.',
+                url: 'formacao.html',
+                position: { x: -8, y: 4, z: -3 },
+                color: 0x4ecca3
+            },
+            {
+                name: 'Experiências',
+                filename: 'experience.log',
+                description: 'Projetos profissionais, trabalhos desenvolvidos e experiências que contribuíram para minha formação como desenvolvedor.',
+                url: 'experiencias.html',
+                position: { x: 7, y: -3, z: 5 },
+                color: 0xff6b9d
+            },
+            {
+                name: 'Projetos',
+                filename: 'projects.json',
+                description: 'Portfólio completo de aplicações web, sistemas e experimentos criativos desenvolvidos ao longo da minha jornada.',
+                url: 'projetos.html',
+                position: { x: -5, y: -5, z: 8 },
+                color: 0xfbbf24
+            }
         ];
 
+        /* ========================================
+           CONFIGURAÇÃO DA CENA THREE.JS
+        ======================================== */
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.z = 15;
+
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         document.body.appendChild(renderer.domElement);
 
+        /* ========================================
+           ILUMINAÇÃO DA CENA
+        ======================================== */
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
         scene.add(ambientLight);
+
         const pointLight = new THREE.PointLight(0xe2d1b1, 1, 100);
         pointLight.position.set(5, 5, 5);
         scene.add(pointLight);
 
-        function createStarTexture() { const canvas = document.createElement('canvas'); canvas.width = 128; canvas.height = 128; const ctx = canvas.getContext('2d'); const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 60); grad.addColorStop(0, 'white'); grad.addColorStop(0.2, 'white'); grad.addColorStop(0.5, 'rgba(226, 209, 177, 0.4)'); grad.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(64, 64, 60, 0, Math.PI * 2); ctx.fill(); return new THREE.CanvasTexture(canvas); }
-        const starsGeom = new THREE.BufferGeometry();
-        const starsPos = [], starsSizes = [];
-        for (let i = 0; i < 18000; i++) { starsPos.push((Math.random() - 0.5) * 1200, (Math.random() - 0.5) * 1200, (Math.random() - 0.5) * 2500); starsSizes.push(Math.random() * 3 + 1); }
-        starsGeom.setAttribute('position', new THREE.Float32BufferAttribute(starsPos, 3));
-        starsGeom.setAttribute('size', new THREE.Float32BufferAttribute(starsSizes, 1));
-        const starsMat = new THREE.PointsMaterial({ size: 4.0, map: createStarTexture(), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, opacity: 0.8, sizeAttenuation: true });
-        const stars = new THREE.Points(starsGeom, starsMat);
+        /* ========================================
+           CRIAÇÃO DO CAMPO DE ESTRELAS
+        ======================================== */
+        // Função para criar textura de estrela com gradiente
+        function createStarTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 128;
+            canvas.height = 128;
+            const ctx = canvas.getContext('2d');
+
+            // Gradiente radial para efeito de brilho
+            const gradient = ctx.createRadialGradient(64, 64, 0, 64, 64, 60);
+            gradient.addColorStop(0, 'white');
+            gradient.addColorStop(0.2, 'white');
+            gradient.addColorStop(0.5, 'rgba(226, 209, 177, 0.4)');
+            gradient.addColorStop(1, 'rgba(0,0,0,0)');
+
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(64, 64, 60, 0, Math.PI * 2);
+            ctx.fill();
+
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        // Criar geometria com 18000 estrelas distribuídas aleatoriamente
+        const starsGeometry = new THREE.BufferGeometry();
+        const starsPositions = [];
+        const starsSizes = [];
+
+        for (let i = 0; i < 18000; i++) {
+            starsPositions.push(
+                (Math.random() - 0.5) * 1200,
+                (Math.random() - 0.5) * 1200,
+                (Math.random() - 0.5) * 2500
+            );
+            starsSizes.push(Math.random() * 3 + 1);
+        }
+
+        starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starsPositions, 3));
+        starsGeometry.setAttribute('size', new THREE.Float32BufferAttribute(starsSizes, 1));
+
+        const starsMaterial = new THREE.PointsMaterial({
+            size: 4.0,
+            map: createStarTexture(),
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+            opacity: 0.8,
+            sizeAttenuation: true
+        });
+
+        const stars = new THREE.Points(starsGeometry, starsMaterial);
         scene.add(stars);
 
+        /* ========================================
+           CRIAÇÃO DOS MÓDULOS 3D (ICOSAEDROS)
+        ======================================== */
         const moduleObjects = [];
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
         let hoveredModule = null;
 
         modules.forEach((module, index) => {
+            // Geometria principal do módulo (icosaedro wireframe)
             const geometry = new THREE.IcosahedronGeometry(0.8, 2);
-            const material = new THREE.MeshBasicMaterial({ color: module.color, wireframe: true, transparent: true, opacity: 0.5 });
+            const material = new THREE.MeshBasicMaterial({
+                color: module.color,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.5
+            });
             const mesh = new THREE.Mesh(geometry, material);
             mesh.position.set(module.position.x, module.position.y, module.position.z);
             mesh.userData = { moduleIndex: index, module: module };
             scene.add(mesh);
 
-            const glowGeom = new THREE.IcosahedronGeometry(0.9, 2);
-            const glowMat = new THREE.MeshBasicMaterial({ color: module.color, transparent: true, opacity: 0.1, side: THREE.BackSide });
-            const glow = new THREE.Mesh(glowGeom, glowMat);
+            // Efeito de brilho (glow) ao redor do módulo
+            const glowGeometry = new THREE.IcosahedronGeometry(0.9, 2);
+            const glowMaterial = new THREE.MeshBasicMaterial({
+                color: module.color,
+                transparent: true,
+                opacity: 0.1,
+                side: THREE.BackSide
+            });
+            const glow = new THREE.Mesh(glowGeometry, glowMaterial);
             mesh.add(glow);
 
-            const ringParticles = new THREE.BufferGeometry();
-            const ringPos = [];
-            for (let i = 0; i < 500; i++) { const angle = Math.random() * Math.PI * 2; const radius = 1.3 + Math.random() * 0.3; ringPos.push(Math.cos(angle) * radius, (Math.random() - 0.5) * 0.1, Math.sin(angle) * radius); }
-            ringParticles.setAttribute('position', new THREE.Float32BufferAttribute(ringPos, 3));
-            const ringMat = new THREE.PointsMaterial({ color: module.color, size: 0.05, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending });
-            const ring = new THREE.Points(ringParticles, ringMat);
+            // Anel de partículas ao redor do módulo
+            const ringGeometry = new THREE.BufferGeometry();
+            const ringPositions = [];
+
+            for (let i = 0; i < 500; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const radius = 1.3 + Math.random() * 0.3;
+                ringPositions.push(
+                    Math.cos(angle) * radius,
+                    (Math.random() - 0.5) * 0.1,
+                    Math.sin(angle) * radius
+                );
+            }
+
+            ringGeometry.setAttribute('position', new THREE.Float32BufferAttribute(ringPositions, 3));
+            const ringMaterial = new THREE.PointsMaterial({
+                color: module.color,
+                size: 0.05,
+                transparent: true,
+                opacity: 0.4,
+                blending: THREE.AdditiveBlending
+            });
+            const ring = new THREE.Points(ringGeometry, ringMaterial);
             scene.add(ring);
             ring.position.copy(mesh.position);
+
+            // Salvar referências
             moduleObjects.push({ mesh, glow, ring, module });
         });
 
+        /* ========================================
+           VARIÁVEIS DE ESTADO
+        ======================================== */
         let spaceship = null;
         let isExperienceStarted = false;
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+        let rotation = { x: 0, y: 0 };
 
-        // CARD GIRA COM A CÂMERA DO ESPAÇO
         const profileCard = document.getElementById('profile-card');
         const profileCardContainer = document.getElementById('profile-card-container');
 
+        /* ========================================
+           FUNÇÃO PARA INICIAR EXPLORAÇÃO
+        ======================================== */
         function startExploration() {
             isExperienceStarted = true;
             document.getElementById('profile-card-container').classList.add('hidden');
@@ -510,43 +674,82 @@
             document.getElementById('nav-hint').classList.add('visible');
         }
 
+        /* ========================================
+           FUNÇÃO PARA VOLTAR AO CARD
+        ======================================== */
+        function returnToCard() {
+            isExperienceStarted = false;
+            document.getElementById('profile-card-container').classList.remove('hidden');
+            document.getElementById('profile-overlay').classList.remove('hidden');
+            document.getElementById('hud').classList.remove('visible');
+            document.getElementById('nav-hint').classList.remove('visible');
+            document.getElementById('info-panel').classList.remove('visible');
+        }
+
+        // Event listeners dos botões
         document.getElementById('explore-btn').addEventListener('click', startExploration);
         document.getElementById('explore-btn-back').addEventListener('click', startExploration);
 
-        let isDragging = false;
-        let previousMousePosition = { x: 0, y: 0 };
-        let rotation = { x: 0, y: 0 };
+        // Event listener da tecla ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && isExperienceStarted) {
+                returnToCard();
+            }
+        });
 
+        /* ========================================
+           CONTROLES DE MOUSE (ROTAÇÃO E ZOOM)
+        ======================================== */
+
+        // Iniciar arraste
         document.addEventListener('mousedown', (e) => {
             isDragging = true;
             previousMousePosition = { x: e.clientX, y: e.clientY };
         });
 
+        // Movimento do mouse (atualiza rotação)
         document.addEventListener('mousemove', (e) => {
+            // Atualizar posição do mouse para raycasting
             mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
 
+            // Se estiver arrastando, rotacionar a cena
             if (isDragging) {
-                const deltaMove = { x: e.clientX - previousMousePosition.x, y: e.clientY - previousMousePosition.y };
+                const deltaMove = {
+                    x: e.clientX - previousMousePosition.x,
+                    y: e.clientY - previousMousePosition.y
+                };
+
                 rotation.y += deltaMove.x * 0.005;
                 rotation.x += deltaMove.y * 0.005;
                 previousMousePosition = { x: e.clientX, y: e.clientY };
             }
         });
 
-        document.addEventListener('mouseup', () => { isDragging = false; });
+        // Parar arraste
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
 
+        // Zoom com scroll do mouse
         document.addEventListener('wheel', (e) => {
             if (!isExperienceStarted) return;
             e.preventDefault();
+
             camera.position.z += e.deltaY * 0.01;
             camera.position.z = Math.max(8, Math.min(30, camera.position.z));
         }, { passive: false });
 
+        /* ========================================
+           CLIQUE NOS MÓDULOS (NAVEGAÇÃO)
+        ======================================== */
         document.addEventListener('click', (e) => {
             if (isDragging || !isExperienceStarted) return;
+
+            // Verificar se clicou em algum módulo
             raycaster.setFromCamera(mouse, camera);
             const intersects = raycaster.intersectObjects(moduleObjects.map(m => m.mesh));
+
             if (intersects.length > 0) {
                 const targetModule = intersects[0].object;
                 const module = targetModule.userData.module;
@@ -556,36 +759,118 @@
             }
         });
 
+        /* ========================================
+           FUNÇÃO DE NAVEGAÇÃO COM ANIMAÇÃO DE NAVE
+        ======================================== */
         function navigateToModule(targetMesh, url) {
             isExperienceStarted = false;
             document.getElementById('info-panel').classList.remove('visible');
+
+            // Criar nave espacial
             const shipGeometry = new THREE.ConeGeometry(0.1, 0.3, 4);
             const shipMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true });
             spaceship = new THREE.Mesh(shipGeometry, shipMaterial);
-            const startPos = new THREE.Vector3((Math.random() - 0.5) * 40, (Math.random() - 0.5) * 40, -30);
+
+            // Posição inicial aleatória
+            const startPos = new THREE.Vector3(
+                (Math.random() - 0.5) * 40,
+                (Math.random() - 0.5) * 40,
+                -30
+            );
             spaceship.position.copy(startPos);
             scene.add(spaceship);
+
+            // Criar rastro da nave
             const trailGeometry = new THREE.BufferGeometry();
             const trailPositions = [];
-            for (let i = 0; i < 20; i++) { trailPositions.push(0, 0, 0); }
+            for (let i = 0; i < 20; i++) {
+                trailPositions.push(0, 0, 0);
+            }
             trailGeometry.setAttribute('position', new THREE.Float32BufferAttribute(trailPositions, 3));
-            const trailMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.1, transparent: true, opacity: 0.6 });
+
+            const trailMaterial = new THREE.PointsMaterial({
+                color: 0xffffff,
+                size: 0.1,
+                transparent: true,
+                opacity: 0.6
+            });
             const trail = new THREE.Points(trailGeometry, trailMaterial);
             scene.add(trail);
+
+            // Animar nave até o módulo
             const targetPos = targetMesh.position.clone();
-            gsap.to(spaceship.position, { x: targetPos.x, y: targetPos.y, z: targetPos.z, duration: 3, ease: 'power2.inOut', onUpdate: function () { spaceship.lookAt(targetPos); spaceship.rotation.x += Math.PI / 2; const positions = trail.geometry.attributes.position.array; for (let i = positions.length - 3; i >= 3; i -= 3) { positions[i] = positions[i - 3]; positions[i + 1] = positions[i - 2]; positions[i + 2] = positions[i - 1]; } positions[0] = spaceship.position.x; positions[1] = spaceship.position.y; positions[2] = spaceship.position.z; trail.geometry.attributes.position.needsUpdate = true; }, onComplete: function () { gsap.to(targetMesh.material, { opacity: 1, duration: 0.2, yoyo: true, repeat: 3 }); setTimeout(() => { gsap.to(document.body, { opacity: 0, duration: 0.5, onComplete: () => { window.location.href = url; } }); }, 500); } });
-            gsap.to(spaceship.scale, { x: 1.3, y: 1.3, z: 1.3, duration: 0.3, yoyo: true, repeat: -1 });
+            gsap.to(spaceship.position, {
+                x: targetPos.x,
+                y: targetPos.y,
+                z: targetPos.z,
+                duration: 3,
+                ease: 'power2.inOut',
+                onUpdate: function () {
+                    // Apontar nave para o destino
+                    spaceship.lookAt(targetPos);
+                    spaceship.rotation.x += Math.PI / 2;
+
+                    // Atualizar rastro
+                    const positions = trail.geometry.attributes.position.array;
+                    for (let i = positions.length - 3; i >= 3; i -= 3) {
+                        positions[i] = positions[i - 3];
+                        positions[i + 1] = positions[i - 2];
+                        positions[i + 2] = positions[i - 1];
+                    }
+                    positions[0] = spaceship.position.x;
+                    positions[1] = spaceship.position.y;
+                    positions[2] = spaceship.position.z;
+                    trail.geometry.attributes.position.needsUpdate = true;
+                },
+                onComplete: function () {
+                    // Piscar módulo e navegar
+                    gsap.to(targetMesh.material, {
+                        opacity: 1,
+                        duration: 0.2,
+                        yoyo: true,
+                        repeat: 3
+                    });
+
+                    setTimeout(() => {
+                        gsap.to(document.body, {
+                            opacity: 0,
+                            duration: 0.5,
+                            onComplete: () => {
+                                window.location.href = url;
+                            }
+                        });
+                    }, 500);
+                }
+            });
+
+            // Animação de pulsação da nave
+            gsap.to(spaceship.scale, {
+                x: 1.3,
+                y: 1.3,
+                z: 1.3,
+                duration: 0.3,
+                yoyo: true,
+                repeat: -1
+            });
         }
 
+        /* ========================================
+           ATUALIZAR HOVER DOS MÓDULOS
+        ======================================== */
         function updateHover() {
             if (!isExperienceStarted) return;
+
             raycaster.setFromCamera(mouse, camera);
             const intersects = raycaster.intersectObjects(moduleObjects.map(m => m.mesh));
+
             if (intersects.length > 0) {
                 const moduleIndex = intersects[0].object.userData.moduleIndex;
+
                 if (hoveredModule !== moduleIndex) {
                     hoveredModule = moduleIndex;
                     const module = modules[moduleIndex];
+
+                    // Atualizar painel de informações
                     document.getElementById('info-title').textContent = module.name;
                     document.getElementById('info-filename').textContent = module.filename;
                     document.getElementById('info-description').textContent = module.description;
@@ -601,44 +886,70 @@
             }
         }
 
+        /* ========================================
+           LOOP DE ANIMAÇÃO
+        ======================================== */
         function animate() {
-            // Card gira junto com a câmera espacial
+            // Card gira junto com a rotação da cena
             if (!isExperienceStarted) {
                 profileCard.style.transform = `rotateY(${rotation.y * 100}deg) rotateX(${-rotation.x * 100}deg)`;
             }
 
+            // Aplicar rotação à cena
             scene.rotation.y = rotation.y;
             scene.rotation.x = rotation.x;
+
+            // Animações dos módulos
             const time = Date.now() * 0.0001;
             moduleObjects.forEach((obj, i) => {
+                // Rotação própria
                 obj.mesh.rotation.y += 0.0015;
                 obj.mesh.rotation.x += 0.0005;
                 obj.ring.rotation.y += 0.002;
+
+                // Movimento de flutuação suave
                 const orbitSpeed = 0.1 + i * 0.05;
                 const orbitRadius = 0.3;
                 const driftX = Math.sin(time * orbitSpeed + i) * orbitRadius * 0.01;
                 const driftY = Math.cos(time * orbitSpeed * 0.7 + i) * orbitRadius * 0.01;
                 const driftZ = Math.sin(time * orbitSpeed * 0.5 + i) * orbitRadius * 0.01;
+
                 obj.mesh.position.x += driftX;
                 obj.mesh.position.y += driftY;
                 obj.mesh.position.z += driftZ;
                 obj.ring.position.copy(obj.mesh.position);
+
+                // Pulsação do brilho
                 const pulse = Math.sin(Date.now() * 0.001 + i) * 0.1 + 1;
                 obj.glow.scale.set(pulse, pulse, pulse);
             });
+
+            // Rotação lenta das estrelas
             stars.rotation.y += 0.0002;
+
+            // Atualizar display de distância da câmera
             document.getElementById('cam-distance').textContent = camera.position.z.toFixed(1);
+
+            // Verificar hover
             updateHover();
+
+            // Renderizar cena
             renderer.render(scene, camera);
             requestAnimationFrame(animate);
         }
 
+        /* ========================================
+           RESPONSIVIDADE
+        ======================================== */
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
+        /* ========================================
+           INICIALIZAÇÃO
+        ======================================== */
         document.body.style.opacity = '0';
         window.addEventListener('load', () => {
             gsap.to(document.body, { opacity: 1, duration: 1 });

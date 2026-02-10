@@ -4,16 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Éter Digital — Experiência 2026</title>
+    <title>Formação — Enrique Silveira</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,700&family=Inter:wght@300;400&family=JetBrains+Mono:wght@300;400&display=swap"
         rel="stylesheet">
     <style>
         :root {
             --bg-color: #050505;
-            --accent-color: #e2d1b1;
+            --accent-color: #4ecca3;
             --text-color: #f5f5f5;
-            --error-color: #ff6b6b;
         }
 
         * {
@@ -30,7 +29,6 @@
             cursor: crosshair;
         }
 
-        /* HUD Overlay */
         #hud {
             position: fixed;
             top: 0;
@@ -48,15 +46,6 @@
         .hud-top {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-        }
-
-        .coordinates {
-            text-align: left;
-        }
-
-        .system-info {
-            text-align: right;
         }
 
         .hud-line {
@@ -81,7 +70,6 @@
             }
         }
 
-        /* Canvas */
         canvas {
             position: fixed;
             top: 0;
@@ -92,60 +80,69 @@
         #scroll-wrapper {
             position: relative;
             z-index: 2;
-            height: 1000vh;
+            min-height: 1000vh;
         }
 
         section {
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             align-items: center;
             padding: 0 10%;
         }
 
         .poetic-content {
-            max-width: 500px;
+            max-width: 700px;
             opacity: 0;
-            transform: translateY(30px);
-            text-shadow: 0 2px 15px rgba(0, 0, 0, 1);
-            background: rgba(5, 5, 5, 0.7);
+            background: rgba(5, 5, 5, 0.85);
             backdrop-filter: blur(15px);
             padding: 40px;
             border-radius: 12px;
-            border: 1px solid rgba(226, 209, 177, 0.15);
-            transition: border-color 0.3s ease;
+            border: 1px solid rgba(78, 204, 163, 0.2);
+            transition: border-color 0.3s ease, transform 0.1s ease;
+            transform-style: preserve-3d;
+            will-change: transform;
         }
 
         .poetic-content:hover {
-            border-color: rgba(226, 209, 177, 0.4);
+            border-color: rgba(78, 204, 163, 0.5);
         }
 
         .poetic-content h1 {
             font-family: 'Playfair Display', serif;
-            font-size: 3.5rem;
+            font-size: 3rem;
             color: var(--accent-color);
-            margin: 0 0 1.5rem 0;
-            line-height: 1.1;
-            overflow: hidden;
+            margin: 0 0 1rem 0;
         }
 
-        .poetic-content h1 .letter {
-            display: inline-block;
-            opacity: 0;
-            transform: translateY(100px) rotateX(90deg);
+        .poetic-content h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--accent-color);
+            margin: 2rem 0 1rem 0;
+        }
+
+        .meta {
+            color: var(--accent-color);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            opacity: 0.8;
+            letter-spacing: 1px;
+        }
+
+        .poetic-content h3 {
+            font-size: 1.3rem;
+            margin: 0.5rem 0 0.5rem 0;
         }
 
         .poetic-content p {
-            font-size: 1.1rem;
+            font-size: 1rem;
             line-height: 1.8;
             opacity: 0.9;
+            margin-bottom: 1rem;
         }
 
-        .poetic-content p .word {
-            display: inline-block;
-            opacity: 0;
-        }
-
-        /* Return button */
         .return-button {
             margin-top: 2rem;
             padding: 12px 30px;
@@ -158,16 +155,14 @@
             transition: all 0.3s ease;
             text-transform: uppercase;
             letter-spacing: 2px;
-            opacity: 0;
         }
 
         .return-button:hover {
             background: var(--accent-color);
             color: var(--bg-color);
-            box-shadow: 0 0 20px rgba(226, 209, 177, 0.5);
+            box-shadow: 0 0 20px rgba(78, 204, 163, 0.5);
         }
 
-        /* Loading screen */
         #loading {
             position: fixed;
             top: 0;
@@ -198,7 +193,7 @@
         .loader-bar {
             width: 300px;
             height: 2px;
-            background: rgba(226, 209, 177, 0.2);
+            background: rgba(78, 204, 163, 0.2);
             position: relative;
             overflow: hidden;
         }
@@ -212,30 +207,43 @@
             width: 0%;
             transition: width 0.3s ease;
         }
+
+        @media (max-width: 768px) {
+            .poetic-content {
+                padding: 30px;
+            }
+
+            .poetic-content h1 {
+                font-size: 2rem;
+            }
+
+            section {
+                padding: 0 5%;
+            }
+        }
     </style>
 </head>
 
 <body>
     <!-- Loading Screen -->
     <div id="loading">
-        <div class="loader-text">INICIALIZANDO SISTEMA<span class="blink">_</span></div>
+        <div class="loader-text">CARREGANDO FORMAÇÃO<span class="blink">_</span></div>
         <div class="loader-bar">
             <div class="loader-progress"></div>
         </div>
     </div>
 
-    <!-- HUD Overlay -->
     <div id="hud">
         <div class="hud-top">
-            <div class="coordinates">
+            <div>
                 <div class="hud-line">X: <span id="coord-x">0.000</span></div>
                 <div class="hud-line">Y: <span id="coord-y">0.000</span></div>
                 <div class="hud-line">Z: <span id="coord-z">0.100</span></div>
             </div>
-            <div class="system-info">
-                <div class="hud-line">GENESIS.EXE</div>
+            <div style="text-align: right;">
+                <div class="hud-line">EDUCATION.DB</div>
                 <div class="hud-line">STATUS: <span style="color: #4ecca3;">ONLINE</span></div>
-                <div class="hud-line">ENTROPY: <span id="entropy">0.0</span>%</div>
+                <div class="hud-line">PROGRESS: <span id="entropy">0.0</span>%</div>
             </div>
         </div>
     </div>
@@ -243,77 +251,79 @@
     <main id="scroll-wrapper">
         <section>
             <div class="poetic-content">
-                <h1 data-text="Genesis.exe">Genesis.exe</h1>
-                <p>No princípio, o bit era silêncio. Você não nasce com um propósito; nasce com um espaço vazio para ser
-                    preenchido.</p>
+                <h1>Ensino Superior</h1>
+                <span class="meta">2026 - Atualmente | IFSul</span>
+                <h3>Licenciatura em Computação</h3>
+                <p>Formação para atuar como professor de Computação na Educação Básica e Técnica. O curso une
+                    fundamentos técnicos (programação, banco de dados, redes, arquitetura de computadores,
+                    desenvolvimento de software) com conhecimentos pedagógicos (didática, metodologias de ensino,
+                    psicologia da educação, tecnologias educacionais).</p>
             </div>
         </section>
 
         <section style="justify-content: flex-end;">
             <div class="poetic-content">
-                <h1 data-text="while(true)">while(true)</h1>
-                <p>O ciclo não perdoa. O peso do erro não se apaga na próxima iteração; ele se torna a base de quem você
-                    é
-                    agora.</p>
+                <span class="meta">2022 - Em andamento | UniFacitie</span>
+                <h3>Análise e Desenvolvimento de Sistemas</h3>
+                <p>Criação, implementação e manutenção de sistemas computacionais, abrangendo programação, banco de
+                    dados, engenharia de software, redes de computadores e segurança da informação, com foco em
+                    desenvolver soluções tecnológicas para atender necessidades de empresas e usuários.</p>
             </div>
         </section>
 
         <section style="justify-content: center;">
             <div class="poetic-content" style="text-align: center;">
-                <h1 data-text="if / else">if / else</h1>
-                <p>Ninguém é seu inimigo por natureza. Cada bifurcação é uma escolha: ferir para se proteger ou ter a
-                    força
-                    de não revidar.</p>
+                <span class="meta">2020 - Trancado | IFSul</span>
+                <h3>Sistemas para Internet</h3>
+                <p>Formação focada no desenvolvimento de aplicações e sistemas web, abordando fundamentos de
+                    programação, desenvolvimento front-end e back-end, bancos de dados, redes e tecnologias para a
+                    internet, com ênfase na criação de soluções web funcionais e responsivas.</p>
             </div>
         </section>
 
         <section>
             <div class="poetic-content">
-                <h1 data-text="padding">padding</h1>
-                <p>Criei margens para não sentir a dor, mas acabei isolado da luz. Onde não há contato, não há vida.</p>
+                <h2>Formação Complementar</h2>
+                <span class="meta">2026 - 2026 | Senac</span>
+                <h3>Juventude Digital - Programador Web</h3>
+                <p>Desenvolvimento de aplicações web com HTML, CSS, JavaScript e React.</p>
             </div>
         </section>
 
         <section style="justify-content: flex-end;">
             <div class="poetic-content">
-                <h1 data-text="return">return</h1>
-                <p>Voltar ao lar não é um recuo. É o momento em que o código finalmente encontra o seu repouso e o
-                    coração,
-                    sua paz.</p>
+                <span class="meta">2025 - 2025 | Senac</span>
+                <h3>RSTI - Desenvolvimento Back End com Java</h3>
+                <p>Desenvolvimento de aplicações com JavaScript, TypeScript, HTML, CSS, Node.js e MySQL. Criação de APIs
+                    e trabalhar com bancos de dados.</p>
             </div>
         </section>
 
         <section style="justify-content: center;">
             <div class="poetic-content" style="text-align: center;">
-                <h1 data-text="Entropy++">Entropy++</h1>
-                <p>O sistema tende ao caos e tudo o que é sólido se desfaz. Lute. Mesmo que o fim seja o nada, cultive
-                    sua
-                    bondade hoje.</p>
+                <span class="meta">2022 - 2023 | Oracle - Alura</span>
+                <h3>Oracle Next Education</h3>
+                <p>Formação em Lógica de Programação, Java, Data Science, Inteligência Artificial, desenvolvimento
+                    pessoal e habilidades para o mercado. Trilhas técnicas de Back-end, Front-end e soft skills.</p>
             </div>
         </section>
 
         <section>
             <div class="poetic-content">
-                <h1 data-text="Timeout">Timeout</h1>
-                <p>O silêncio não é uma falha. Se o fardo exceder a sua força, descanse. O infinito compreende a
-                    brevidade
-                    do seu fôlego.</p>
+                <span class="meta">2022 - 2022 | PROA</span>
+                <h3>Plataforma PROA</h3>
+                <p>Formação focada em desenvolvimento pessoal e preparação para o mercado de trabalho, com ênfase em
+                    comunicação, raciocínio lógico, projeto profissional, trabalho em equipe e empregabilidade.</p>
             </div>
         </section>
 
-        <section>
+        <section style="justify-content: flex-end;">
             <div class="poetic-content">
-                <h1 data-text="EOF">EOF</h1>
-                <p>Todo ciclo termina. Não com estrondo, mas com um sussurro. O que você construiu permanece, mesmo
-                    quando você não está mais aqui para vê-lo.</p>
-            </div>
-        </section>
-
-        <section style="justify-content: center;">
-            <div class="poetic-content" style="text-align: center;">
-                <h1 data-text="∞">∞</h1>
-                <p>E então, o sistema retorna ao vazio. Mas o vazio não é o fim — é a promessa de um novo início.</p>
-                <button class="return-button" onclick="window.location.href='index.html'">Retornar ao início</button>
+                <span class="meta">2022 - 2022 | Prefeitura de Pelotas</span>
+                <h3>Programa Start</h3>
+                <p>Curso de capacitação profissional e desenvolvimento pessoal para jovens, com ênfase em protagonismo,
+                    metodologias ativas, habilidades comportamentais e inserção no mercado de trabalho.</p>
+                <button class="return-button" onclick="window.location.href='index.html'">Retornar ao Espaço</button>
             </div>
         </section>
     </main>
@@ -321,7 +331,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-
     <script>
         // ===== LOADING SCREEN =====
         let loadProgress = 0;
@@ -338,7 +347,6 @@
             }
         }
 
-        // Simulate loading
         let simLoad = 0;
         const loadInterval = setInterval(() => {
             simLoad += Math.random() * 15;
@@ -352,10 +360,7 @@
         gsap.registerPlugin(ScrollTrigger);
 
         // ===== MOUSE TRACKING =====
-        let mouseX = 0;
-        let mouseY = 0;
-        let targetMouseX = 0;
-        let targetMouseY = 0;
+        let mouseX = 0, mouseY = 0, targetMouseX = 0, targetMouseY = 0;
 
         document.addEventListener('mousemove', (e) => {
             targetMouseX = (e.clientX / window.innerWidth) * 2 - 1;
@@ -372,7 +377,6 @@
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         document.body.appendChild(renderer.domElement);
 
-        // ===== STAR TEXTURE =====
         function createStarTexture() {
             const canvas = document.createElement('canvas');
             canvas.width = 128;
@@ -381,7 +385,7 @@
             const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 60);
             grad.addColorStop(0, 'white');
             grad.addColorStop(0.2, 'white');
-            grad.addColorStop(0.5, 'rgba(226, 209, 177, 0.4)');
+            grad.addColorStop(0.5, 'rgba(78,204,163,0.4)');
             grad.addColorStop(1, 'rgba(0,0,0,0)');
             ctx.fillStyle = grad;
             ctx.beginPath();
@@ -390,14 +394,10 @@
             return new THREE.CanvasTexture(canvas);
         }
 
-        // ===== STARFIELD =====
         const starsGeom = new THREE.BufferGeometry();
-        const starsPos = [];
-        const starsSizes = [];
+        const starsPos = [], starsSizes = [];
         for (let i = 0; i < 18000; i++) {
-            starsPos.push((Math.random() - 0.5) * 1200);
-            starsPos.push((Math.random() - 0.5) * 1200);
-            starsPos.push((Math.random() - 0.5) * 2500);
+            starsPos.push((Math.random() - 0.5) * 1200, (Math.random() - 0.5) * 1200, (Math.random() - 0.5) * 2500);
             starsSizes.push(Math.random() * 3 + 1);
         }
         starsGeom.setAttribute('position', new THREE.Float32BufferAttribute(starsPos, 3));
@@ -415,10 +415,9 @@
         const starField = new THREE.Points(starsGeom, starsMat);
         scene.add(starField);
 
-        // ===== CORE PLANET =====
         const coreGeom = new THREE.IcosahedronGeometry(1.5, 2);
         const coreMat = new THREE.MeshBasicMaterial({
-            color: 0xe2d1b1,
+            color: 0x4ecca3,
             wireframe: true,
             transparent: true,
             opacity: 0.5
@@ -426,7 +425,7 @@
         const core = new THREE.Mesh(coreGeom, coreMat);
         scene.add(core);
 
-        // ===== GSAP SCROLL ANIMATION =====
+        // ===== SCROLL ANIMATION =====
         const tl = gsap.timeline({
             scrollTrigger: {
                 trigger: "#scroll-wrapper",
@@ -434,9 +433,7 @@
                 end: "bottom bottom",
                 scrub: 2.5,
                 onUpdate: (self) => {
-                    // Update entropy display
-                    const entropy = (self.progress * 100).toFixed(1);
-                    document.getElementById('entropy').textContent = entropy;
+                    document.getElementById('entropy').textContent = (self.progress * 100).toFixed(1);
                 }
             }
         });
@@ -446,44 +443,11 @@
             .to(core.scale, { x: 0.008, y: 0.008, z: 0.008, ease: "power4.in" }, 0)
             .to(coreMat, { opacity: 0.8, ease: "power2.in" }, 0);
 
-        // ===== TEXT ANIMATIONS =====
-        function splitTextIntoLetters(element) {
-            const text = element.getAttribute('data-text');
-            element.innerHTML = '';
-            for (let char of text) {
-                const span = document.createElement('span');
-                span.className = 'letter';
-                span.textContent = char === ' ' ? '\u00A0' : char;
-                element.appendChild(span);
-            }
-        }
-
-        function splitTextIntoWords(element) {
-            const text = element.textContent;
-            element.innerHTML = '';
-            const words = text.split(' ');
-            words.forEach((word, index) => {
-                const span = document.createElement('span');
-                span.className = 'word';
-                span.textContent = word;
-                element.appendChild(span);
-                if (index < words.length - 1) {
-                    element.appendChild(document.createTextNode(' '));
-                }
-            });
-        }
-
-        document.querySelectorAll('.poetic-content h1').forEach(splitTextIntoLetters);
-        document.querySelectorAll('.poetic-content p').forEach(splitTextIntoWords);
-
+        // ===== CARD ANIMATIONS =====
         gsap.utils.toArray(".poetic-content").forEach((card) => {
-            const letters = card.querySelectorAll('.letter');
-            const words = card.querySelectorAll('.word');
-            const button = card.querySelector('.return-button');
-
+            // Fade in on scroll
             gsap.to(card, {
                 opacity: 1,
-                y: 0,
                 scrollTrigger: {
                     trigger: card,
                     start: "top 85%",
@@ -492,66 +456,52 @@
                 }
             });
 
-            // Animate title letters (slower)
-            gsap.to(letters, {
-                opacity: 1,
-                y: 0,
-                rotateX: 0,
-                stagger: 0.05,
-                scrollTrigger: {
-                    trigger: card,
-                    start: "top 80%",
-                    end: "top 35%",
-                    scrub: 1.5
-                }
-            });
+            // 3D tilt effect on hover
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
 
-            // Animate paragraph words (delayed after title, slower)
-            gsap.to(words, {
-                opacity: 0.9,
-                stagger: 0.04,
-                scrollTrigger: {
-                    trigger: card,
-                    start: "top 65%",
-                    end: "top 25%",
-                    scrub: 1.5
-                }
-            });
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
 
-            // Animate button (if exists)
-            if (button) {
-                gsap.to(button, {
-                    opacity: 1,
-                    scrollTrigger: {
-                        trigger: card,
-                        start: "top 50%",
-                        end: "top 20%",
-                        scrub: 1.5
-                    }
+                const rotateX = ((y - centerY) / centerY) * 10;
+                const rotateY = ((centerX - x) / centerX) * 10;
+
+                gsap.to(card, {
+                    duration: 0.3,
+                    rotateX: rotateX,
+                    rotateY: rotateY,
+                    transformPerspective: 1000,
+                    ease: "power2.out"
                 });
-            }
+            });
+
+            card.addEventListener('mouseleave', () => {
+                gsap.to(card, {
+                    duration: 0.5,
+                    rotateX: 0,
+                    rotateY: 0,
+                    ease: "power2.out"
+                });
+            });
         });
 
         // ===== ANIMATION LOOP =====
         function animate() {
-            // Smooth mouse following
             mouseX += (targetMouseX - mouseX) * 0.05;
             mouseY += (targetMouseY - mouseY) * 0.05;
 
-            // Parallax effect
             starField.rotation.x = mouseY * 0.05;
             starField.rotation.y = mouseX * 0.05;
 
             core.rotation.y += 0.0015;
             core.rotation.x += 0.0005;
-
-            // Mouse influence on core
             core.rotation.y += mouseX * 0.001;
             core.rotation.x += mouseY * 0.001;
 
             starField.rotation.y += 0.0002;
 
-            // Update HUD
             document.getElementById('coord-x').textContent = mouseX.toFixed(3);
             document.getElementById('coord-y').textContent = mouseY.toFixed(3);
             document.getElementById('coord-z').textContent = camera.position.z.toFixed(3);
@@ -561,7 +511,6 @@
         }
         animate();
 
-        // ===== RESIZE HANDLER =====
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();

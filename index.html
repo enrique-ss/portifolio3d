@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Éter Digital — Sistema</title>
+    <title>Enrique Silveira - Portfólio Espacial</title>
     <link
         href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;1,700&display=swap"
         rel="stylesheet">
@@ -30,6 +30,152 @@
             z-index: 1;
         }
 
+        /* Overlay escuro de fundo */
+        #profile-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 49;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+
+        #profile-overlay.hidden {
+            opacity: 0;
+        }
+
+        /* Profile card in center */
+        #profile-card {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 50;
+            background: rgba(5, 5, 5, 0.95);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(226, 209, 177, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            text-align: center;
+            opacity: 1;
+            pointer-events: all;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        #profile-card.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: translate(-50%, -50%) scale(0.9);
+        }
+
+        .profile-card__image {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 3px solid rgba(226, 209, 177, 0.5);
+            margin: 0 auto 20px;
+            object-fit: cover;
+        }
+
+        .profile-card__name {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #e2d1b1;
+        }
+
+        .profile-card__role {
+            font-size: 0.9rem;
+            color: #4ecca3;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .profile-card__bio {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 25px;
+        }
+
+        .profile-card__social {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .profile-social-link {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(226, 209, 177, 0.1);
+            border: 1px solid rgba(226, 209, 177, 0.3);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 1.2rem;
+        }
+
+        .profile-social-link:hover {
+            background: rgba(226, 209, 177, 0.2);
+            border-color: rgba(226, 209, 177, 0.5);
+            transform: translateY(-3px);
+        }
+
+        .explore-button {
+            padding: 15px 50px;
+            background: transparent;
+            border: 2px solid #e2d1b1;
+            color: #e2d1b1;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .explore-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: #e2d1b1;
+            transition: width 0.4s ease, height 0.4s ease;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+        }
+
+        .explore-button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .explore-button:hover {
+            color: #050505;
+            border-color: #e2d1b1;
+            box-shadow: 0 0 30px rgba(226, 209, 177, 0.5);
+        }
+
         /* HUD */
         #hud {
             position: fixed;
@@ -37,8 +183,13 @@
             left: 20px;
             z-index: 100;
             font-size: 11px;
-            opacity: 0.6;
+            opacity: 0;
             pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        #hud.visible {
+            opacity: 0.6;
         }
 
         .hud-line {
@@ -202,9 +353,14 @@
             transform: translateY(-50%);
             z-index: 100;
             font-size: 11px;
-            opacity: 0.4;
+            opacity: 0;
             text-align: right;
             pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        #nav-hint.visible {
+            opacity: 0.4;
         }
 
         .hint-line {
@@ -250,30 +406,56 @@
             #nav-hint {
                 display: none;
             }
+
+            .profile-card__name {
+                font-size: 1.5rem;
+            }
+
+            .explore-button {
+                padding: 12px 35px;
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
 
 <body>
-    <!-- Welcome Screen -->
-    <div id="welcome">
-        <h1 class="welcome-title">Éter Digital</h1>
-        <p class="welcome-subtitle">Sistema Filosófico Interativo — 2026</p>
-        <div class="welcome-instructions">
-            <div class="instruction-line">Navegue pelo espaço usando <span class="key">MOUSE</span> para rotacionar
-            </div>
-            <div class="instruction-line">Use <span class="key">SCROLL</span> para aproximar/afastar</div>
-            <div class="instruction-line">Clique nos módulos <span class="key">◉</span> para acessá-los</div>
+    <!-- Overlay escuro -->
+    <div id="profile-overlay"></div>
+
+    <!-- Profile Card (shows immediately) -->
+    <div id="profile-card">
+        <img class="profile-card__image" src="./resources/images.png" alt="Foto de perfil de Enrique Silveira">
+        <h2 class="profile-card__name">Enrique Silveira</h2>
+        <p class="profile-card__role">Dev Full-Stack & Professor</p>
+        <p class="profile-card__bio">
+            Estudante de Licenciatura em Computação no IFSul. Apaixonado por ensinar e desenvolver soluções criativas.
+            Meu código aberto reflete minha filosofia: aprender para ensinar e ensinar para acessibilizar.
+        </p>
+        <div class="profile-card__social">
+            <a href="https://mail.google.com/mail/?view=cm&to=enriqueabyss@gmail.com" target="_blank"
+                rel="noopener noreferrer" class="profile-social-link" title="Email">
+                ✉️
+            </a>
+            <a href="https://github.com/enrique-ss" target="_blank" rel="noopener noreferrer"
+                class="profile-social-link" title="GitHub">
+                💻
+            </a>
+            <a href="https://www.linkedin.com/in/luiz-enrique-ss/" target="_blank" rel="noopener noreferrer"
+                class="profile-social-link" title="LinkedIn">
+                🔗
+            </a>
         </div>
-        <button class="start-button" onclick="startExperience()">INICIAR EXPLORAÇÃO</button>
+        <button class="explore-button" id="explore-btn">Explorar</button>
     </div>
 
     <!-- HUD -->
     <div id="hud">
-        <div class="hud-line">ÉTER DIGITAL v1.0.0</div>
-        <div class="hud-line">MÓDULOS: <span id="module-count">3/4</span></div>
-        <div class="hud-line">STATUS: <span style="color: #4ecca3;">ONLINE</span><span class="status-dot"></span></div>
-        <div class="hud-line">CAM: <span id="cam-distance">5.0</span></div>
+        <div class="hud-line">PORTFÓLIO ESPACIAL v1.0</div>
+        <div class="hud-line">SEÇÕES: <span id="module-count">3</span></div>
+        <div class="hud-line">STATUS: <span style="color: #4ecca3;">EXPLORÁVEL</span><span class="status-dot"></span>
+        </div>
+        <div class="hud-line">CAM: <span id="cam-distance">15.0</span></div>
     </div>
 
     <!-- Navigation Hint -->
@@ -295,40 +477,34 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
     <script>
-        // Module data
+        // Module data - Portfolio sections (without "Sobre Mim")
         const modules = [
             {
-                name: 'Genesis',
-                filename: '01_genesis.exe',
-                description: 'Uma jornada através do cosmos interior. Explore reflexões filosóficas enquanto navega por um universo de wireframe.',
-                url: 'eter-digital-enhanced.html',
+                name: 'Formação',
+                filename: 'education.db',
+                description: 'Minha jornada acadêmica: Licenciatura em Computação, cursos complementares e certificações que moldaram meu conhecimento.',
+                url: 'formacao.html',
                 position: { x: -8, y: 4, z: -3 },
-                color: 0xe2d1b1
+                color: 0x4ecca3,
+                icon: '🎓'
             },
             {
-                name: 'The Debugger',
-                filename: '02_debugger.sh',
-                description: 'Terminal interativo que refatora pensamentos destrutivos. Digite seus erros e veja-os transformados em aprendizados.',
-                url: 'debugger.html',
+                name: 'Experiências',
+                filename: 'experience.log',
+                description: 'Projetos profissionais, trabalhos desenvolvidos e experiências que contribuíram para minha formação como desenvolvedor.',
+                url: 'experiencias.html',
                 position: { x: 7, y: -3, z: 5 },
-                color: 0x4ecca3
+                color: 0xff6b9d,
+                icon: '💼'
             },
             {
-                name: 'Neural Garden',
-                filename: '03_neural_garden.py',
-                description: 'Jardim generativo onde você cultiva ordem contra a entropia. Plante, regue e pode em uma metáfora viva.',
-                url: 'neural-garden.html',
+                name: 'Projetos',
+                filename: 'projects.json',
+                description: 'Portfólio completo de aplicações web, sistemas e experimentos criativos desenvolvidos ao longo da minha jornada.',
+                url: 'projetos.html',
                 position: { x: -5, y: -5, z: 8 },
-                color: 0xff6b9d
-            },
-            {
-                name: 'Latency of Being',
-                filename: '04_latency.bin',
-                description: '[EM DESENVOLVIMENTO] Viaje através de túneis de fibra ótica e explore memórias fragmentadas.',
-                url: null,
-                position: { x: 6, y: 5, z: -7 },
-                color: 0x666666,
-                disabled: true
+                color: 0xfbbf24,
+                icon: '🚀'
             }
         ];
 
@@ -451,7 +627,20 @@
 
         // Spaceship
         let spaceship = null;
-        let isExperienceStarted = false;
+        let isExperienceStarted = false; // Start disabled until explore button is clicked
+
+        // Explore button handler
+        document.getElementById('explore-btn').addEventListener('click', () => {
+            isExperienceStarted = true;
+
+            // Hide profile card
+            document.getElementById('profile-card').classList.add('hidden');
+            document.getElementById('profile-overlay').classList.add('hidden');
+
+            // Show HUD and nav hints
+            document.getElementById('hud').classList.add('visible');
+            document.getElementById('nav-hint').classList.add('visible');
+        });
 
         // Mouse interaction
         let isDragging = false;
@@ -459,11 +648,14 @@
         let rotation = { x: 0, y: 0 };
 
         document.addEventListener('mousedown', (e) => {
+            if (!isExperienceStarted) return;
             isDragging = true;
             previousMousePosition = { x: e.clientX, y: e.clientY };
         });
 
         document.addEventListener('mousemove', (e) => {
+            if (!isExperienceStarted) return;
+
             // Update mouse for raycasting
             mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
@@ -488,6 +680,7 @@
 
         // Zoom with scroll
         document.addEventListener('wheel', (e) => {
+            if (!isExperienceStarted) return;
             e.preventDefault();
             camera.position.z += e.deltaY * 0.01;
             camera.position.z = Math.max(8, Math.min(30, camera.position.z));
@@ -680,17 +873,6 @@
             updateHover();
             renderer.render(scene, camera);
             requestAnimationFrame(animate);
-        }
-
-        // Start experience
-        function startExperience() {
-            document.getElementById('welcome').classList.add('hidden');
-            isExperienceStarted = true;
-            gsap.from(camera.position, {
-                z: 40,
-                duration: 2.5,
-                ease: 'power2.out'
-            });
         }
 
         // Window resize

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formação — Enrique Silveira</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,700&family=Inter:wght@300;400&family=JetBrains+Mono:wght@300;400&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050505;
+            --accent-color: #4ecca3;
+            --text-color: #f5f5f5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            cursor: crosshair;
+        }
+
+        #hud {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            pointer-events: none;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--accent-color);
+            opacity: 0.6;
+            padding: 20px;
+        }
+
+        .hud-top {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .hud-line {
+            margin-bottom: 4px;
+            letter-spacing: 1px;
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        #scroll-wrapper {
+            position: relative;
+            z-index: 2;
+            min-height: 600vh;
+        }
+
+        section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 0 10%;
+        }
+
+        .content-card {
+            max-width: 700px;
+            opacity: 0;
+            transform: translateY(30px);
+            background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(15px);
+            padding: 40px;
+            border-radius: 12px;
+            border: 1px solid rgba(78, 204, 163, 0.3);
+        }
+
+        .content-card:hover {
+            border-color: rgba(78, 204, 163, 0.6);
+        }
+
+        .content-card h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            color: var(--accent-color);
+            margin: 0 0 1rem 0;
+        }
+
+        .content-card h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--accent-color);
+            margin: 2rem 0 1rem 0;
+        }
+
+        .meta {
+            color: var(--accent-color);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            opacity: 0.8;
+        }
+
+        .content-card h3 {
+            font-size: 1.3rem;
+            margin: 1.5rem 0 0.5rem 0;
+        }
+
+        .content-card p {
+            font-size: 1rem;
+            line-height: 1.8;
+            opacity: 0.9;
+            margin-bottom: 1rem;
+        }
+
+        .return-button {
+            margin-top: 2rem;
+            padding: 12px 30px;
+            background: transparent;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0;
+        }
+
+        .return-button:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            box-shadow: 0 0 20px rgba(78, 204, 163, 0.5);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="hud">
+        <div class="hud-top">
+            <div>
+                <div class="hud-line">X: <span id="coord-x">0.000</span></div>
+                <div class="hud-line">Y: <span id="coord-y">0.000</span></div>
+                <div class="hud-line">Z: <span id="coord-z">0.100</span></div>
+            </div>
+            <div style="text-align: right;">
+                <div class="hud-line">EDUCATION.DB</div>
+                <div class="hud-line">STATUS: <span style="color: #4ecca3;">ONLINE</span></div>
+                <div class="hud-line">PROGRESS: <span id="entropy">0.0</span>%</div>
+            </div>
+        </div>
+    </div>
+
+    <main id="scroll-wrapper">
+        <section>
+            <div class="content-card">
+                <h1>Ensino Superior</h1>
+                <span class="meta">2026 - Atualmente | IFSul</span>
+                <h3>Licenciatura em Computação</h3>
+                <p>Formação para atuar como professor de Computação na Educação Básica e Técnica. O curso une
+                    fundamentos técnicos (programação, banco de dados, redes, arquitetura de computadores,
+                    desenvolvimento de software) com conhecimentos pedagógicos (didática, metodologias de ensino,
+                    psicologia da educação, tecnologias educacionais).</p>
+            </div>
+        </section>
+
+        <section style="justify-content: flex-end;">
+            <div class="content-card">
+                <span class="meta">2022 - Em andamento | UniFacitie</span>
+                <h3>Análise e Desenvolvimento de Sistemas</h3>
+                <p>Criação, implementação e manutenção de sistemas computacionais, abrangendo programação, banco de
+                    dados, engenharia de software, redes de computadores e segurança da informação.</p>
+            </div>
+        </section>
+
+        <section style="justify-content: center;">
+            <div class="content-card" style="text-align: center;">
+                <span class="meta">2020 - Trancado | IFSul</span>
+                <h3>Sistemas para Internet</h3>
+                <p>Formação focada no desenvolvimento de aplicações e sistemas web, abordando fundamentos de
+                    programação, desenvolvimento front-end e back-end, bancos de dados, redes e tecnologias para a
+                    internet.</p>
+            </div>
+        </section>
+
+        <section>
+            <div class="content-card">
+                <h2>Formação Complementar</h2>
+                <span class="meta">2026 - 2026 | Senac</span>
+                <h3>Juventude Digital - Programador Web</h3>
+                <p>Desenvolvimento de aplicações web com HTML, CSS, JavaScript e React.</p>
+            </div>
+        </section>
+
+        <section style="justify-content: flex-end;">
+            <div class="content-card">
+                <span class="meta">2025 - 2025 | Senac</span>
+                <h3>RSTI - Desenvolvimento Back End</h3>
+                <p>Desenvolvimento de aplicações com JavaScript, TypeScript, HTML, CSS, Node.js e MySQL. Criação de APIs
+                    e trabalho com bancos de dados.</p>
+            </div>
+        </section>
+
+        <section style="justify-content: center;">
+            <div class="content-card" style="text-align: center;">
+                <span class="meta">2022 - 2023 | Oracle - Alura</span>
+                <h3>Oracle Next Education</h3>
+                <p>Formação em Lógica de Programação, Java, Data Science, Inteligência Artificial, desenvolvimento
+                    pessoal e habilidades para o mercado.</p>
+            </div>
+        </section>
+
+        <section>
+            <div class="content-card">
+                <span class="meta">2022 - 2022 | PROA</span>
+                <h3>Plataforma PROA</h3>
+                <p>Formação focada em desenvolvimento pessoal e preparação para o mercado de trabalho, com ênfase em
+                    comunicação, raciocínio lógico e trabalho em equipe.</p>
+            </div>
+        </section>
+
+        <section style="justify-content: flex-end;">
+            <div class="content-card">
+                <span class="meta">2022 - 2022 | Prefeitura de Pelotas</span>
+                <h3>Programa Start</h3>
+                <p>Curso de capacitação profissional e desenvolvimento pessoal para jovens, com ênfase em protagonismo e
+                    inserção no mercado de trabalho.</p>
+                <button class="return-button" onclick="window.location.href='index.html'">Retornar ao Espaço</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+        let mouseX = 0, mouseY = 0, targetMouseX = 0, targetMouseY = 0;
+        document.addEventListener('mousemove', (e) => { targetMouseX = (e.clientX / window.innerWidth) * 2 - 1; targetMouseY = -(e.clientY / window.innerHeight) * 2 + 1; });
+        const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.01, 3000);
+        camera.position.z = 0.1;
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        document.body.appendChild(renderer.domElement);
+        function createStarTexture() { const canvas = document.createElement('canvas'); canvas.width = 128; canvas.height = 128; const ctx = canvas.getContext('2d'), grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 60); grad.addColorStop(0, 'white'); grad.addColorStop(0.2, 'white'); grad.addColorStop(0.5, 'rgba(78,204,163,0.4)'); grad.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(64, 64, 60, 0, Math.PI * 2); ctx.fill(); return new THREE.CanvasTexture(canvas); }
+        const starsGeom = new THREE.BufferGeometry(), starsPos = [], starsSizes = [];
+        for (let i = 0; i < 18000; i++) { starsPos.push((Math.random() - 0.5) * 1200, (Math.random() - 0.5) * 1200, (Math.random() - 0.5) * 2500); starsSizes.push(Math.random() * 3 + 1); }
+        starsGeom.setAttribute('position', new THREE.Float32BufferAttribute(starsPos, 3));
+        starsGeom.setAttribute('size', new THREE.Float32BufferAttribute(starsSizes, 1));
+        const starsMat = new THREE.PointsMaterial({ size: 4, map: createStarTexture(), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, opacity: 0.8, sizeAttenuation: true }), starField = new THREE.Points(starsGeom, starsMat);
+        scene.add(starField);
+        const coreGeom = new THREE.IcosahedronGeometry(1.5, 2), coreMat = new THREE.MeshBasicMaterial({ color: 0x4ecca3, wireframe: true, transparent: true, opacity: 0.5 }), core = new THREE.Mesh(coreGeom, coreMat);
+        scene.add(core);
+        const tl = gsap.timeline({ scrollTrigger: { trigger: "#scroll-wrapper", start: "top top", end: "bottom bottom", scrub: 2.5, onUpdate: (self) => { document.getElementById('entropy').textContent = (self.progress * 100).toFixed(1); } } });
+        tl.to(camera.position, { z: 150, ease: "power1.inOut" }, 0).to(core.rotation, { y: Math.PI * 1.5, ease: "none" }, 0).to(core.scale, { x: 0.008, y: 0.008, z: 0.008, ease: "power4.in" }, 0).to(coreMat, { opacity: 0.8, ease: "power2.in" }, 0);
+        gsap.utils.toArray(".content-card").forEach(card => { const button = card.querySelector('.return-button'); gsap.to(card, { opacity: 1, y: 0, scrollTrigger: { trigger: card, start: "top 85%", end: "top 20%", scrub: true } }); if (button) gsap.to(button, { opacity: 1, scrollTrigger: { trigger: card, start: "top 50%", end: "top 20%", scrub: 1.5 } }); });
+        function animate() { mouseX += (targetMouseX - mouseX) * 0.05; mouseY += (targetMouseY - mouseY) * 0.05; starField.rotation.x = mouseY * 0.05; starField.rotation.y = mouseX * 0.05; core.rotation.y += 0.0015; core.rotation.x += 0.0005; core.rotation.y += mouseX * 0.001; core.rotation.x += mouseY * 0.001; starField.rotation.y += 0.0002; document.getElementById('coord-x').textContent = mouseX.toFixed(3); document.getElementById('coord-y').textContent = mouseY.toFixed(3); document.getElementById('coord-z').textContent = camera.position.z.toFixed(3); renderer.render(scene, camera); requestAnimationFrame(animate); }
+        animate();
+        window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
+    </script>
+</body>
+
+</html>

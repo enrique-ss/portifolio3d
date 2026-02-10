@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neural Garden — Éter Digital</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #050505;
+            overflow: hidden;
+            font-family: 'JetBrains Mono', monospace;
+            cursor: none;
+        }
+
+        #canvas {
+            display: block;
+        }
+
+        .hud {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: #4ecca3;
+            font-size: 12px;
+            z-index: 100;
+            text-shadow: 0 0 10px rgba(78, 204, 163, 0.5);
+            pointer-events: none;
+        }
+
+        .hud-line {
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+
+        .entropy-bar {
+            width: 200px;
+            height: 4px;
+            background: rgba(78, 204, 163, 0.2);
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .entropy-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ecca3, #ff6b6b);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .instructions {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #e2d1b1;
+            font-size: 11px;
+            text-align: center;
+            opacity: 0.7;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .instruction-line {
+            margin: 5px 0;
+        }
+
+        .back-link {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            color: #4ecca3;
+            text-decoration: none;
+            font-size: 12px;
+            z-index: 100;
+            padding: 8px 12px;
+            border: 1px solid #4ecca3;
+            border-radius: 4px;
+            background: rgba(5, 5, 5, 0.8);
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: #4ecca3;
+            color: #050505;
+        }
+
+        .custom-cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #4ecca3;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1000;
+            transition: transform 0.1s ease;
+            box-shadow: 0 0 15px rgba(78, 204, 163, 0.5);
+        }
+
+        .custom-cursor.active {
+            transform: scale(1.5);
+            border-color: #ff6b6b;
+            box-shadow: 0 0 25px rgba(255, 107, 107, 0.7);
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 0.5;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <a href="eter-digital-enhanced.html" class="back-link">← GENESIS</a>
+
+    <div class="hud">
+        <div class="hud-line">NEURAL_GARDEN.PY</div>
+        <div class="hud-line">STATUS: <span id="status">CRESCENDO</span></div>
+        <div class="hud-line">PLANTAS: <span id="plant-count">0</span></div>
+        <div class="hud-line">ENTROPIA: <span id="entropy-value">0</span>%</div>
+        <div class="entropy-bar">
+            <div class="entropy-fill" id="entropy-bar"></div>
+        </div>
+    </div>
+
+    <div class="instructions">
+        <div class="instruction-line">CLIQUE para plantar sementes de ordem</div>
+        <div class="instruction-line">SEGURE para regar e crescer</div>
+        <div class="instruction-line">ESPAÇO para podar o caos</div>
+        <div class="instruction-line">R para resetar o jardim</div>
+    </div>
+
+    <div class="custom-cursor" id="cursor"></div>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Custom cursor
+        const cursor = document.getElementById('cursor');
+        let mouseX = 0, mouseY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            cursor.style.left = mouseX - 10 + 'px';
+            cursor.style.top = mouseY - 10 + 'px';
+        });
+
+        // Plant system
+        class Plant {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.branches = [];
+                this.age = 0;
+                this.maxAge = 100 + Math.random() * 100;
+                this.color = `hsl(${120 + Math.random() * 60}, 70%, 50%)`;
+                this.entropy = 0;
+                this.dead = false;
+
+                // Initial branch
+                this.branches.push({
+                    angle: -Math.PI / 2,
+                    length: 0,
+                    thickness: 5,
+                    generation: 0
+                });
+            }
+
+            grow(waterAmount = 1) {
+                if (this.dead) return;
+
+                this.age += waterAmount;
+
+                // Grow existing branches
+                this.branches.forEach(branch => {
+                    if (branch.length < branch.generation * 15 + 30) {
+                        branch.length += 0.5 * waterAmount;
+                    } else if (branch.generation < 4 && Math.random() < 0.02 * waterAmount) {
+                        // Split branch
+                        const newAngle1 = branch.angle - 0.3 - Math.random() * 0.3;
+                        const newAngle2 = branch.angle + 0.3 + Math.random() * 0.3;
+
+                        this.branches.push({
+                            angle: newAngle1,
+                            length: 0,
+                            thickness: branch.thickness * 0.7,
+                            generation: branch.generation + 1,
+                            parent: branch
+                        });
+
+                        this.branches.push({
+                            angle: newAngle2,
+                            length: 0,
+                            thickness: branch.thickness * 0.7,
+                            generation: branch.generation + 1,
+                            parent: branch
+                        });
+                    }
+                });
+
+                // Increase entropy over time
+                this.entropy += 0.1;
+
+                if (this.age > this.maxAge) {
+                    this.dead = true;
+                }
+            }
+
+            applyEntropy() {
+                this.entropy += 5;
+                this.branches.forEach(branch => {
+                    branch.angle += (Math.random() - 0.5) * 0.2;
+                    branch.thickness *= 0.98;
+                });
+            }
+
+            prune() {
+                this.entropy = Math.max(0, this.entropy - 20);
+                this.dead = false;
+                this.age = Math.min(this.age, this.maxAge * 0.8);
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+
+                this.branches.forEach(branch => {
+                    const opacity = this.dead ? 0.2 : Math.max(0.3, 1 - this.entropy / 200);
+                    const wobble = Math.sin(Date.now() * 0.001 + branch.angle) * (this.entropy * 0.01);
+
+                    ctx.strokeStyle = this.dead ? '#444' : this.color;
+                    ctx.globalAlpha = opacity;
+                    ctx.lineWidth = branch.thickness;
+                    ctx.lineCap = 'round';
+
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+
+                    const endX = Math.cos(branch.angle + wobble) * branch.length;
+                    const endY = Math.sin(branch.angle + wobble) * branch.length;
+
+                    ctx.lineTo(endX, endY);
+                    ctx.stroke();
+
+                    // Draw leaves at branch ends
+                    if (branch.generation >= 2 && !this.dead) {
+                        ctx.fillStyle = `hsla(${120 + Math.random() * 40}, 80%, 60%, ${opacity})`;
+                        ctx.beginPath();
+                        ctx.arc(endX, endY, 3, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+
+                    // Translate to branch end for next iteration
+                    if (branch.parent) {
+                        ctx.translate(
+                            Math.cos(branch.parent.angle) * branch.parent.length,
+                            Math.sin(branch.parent.angle) * branch.parent.length
+                        );
+                    }
+                });
+
+                ctx.restore();
+            }
+        }
+
+        // Noise particles (entropy visualization)
+        class NoiseParticle {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 2;
+                this.vy = (Math.random() - 0.5) * 2;
+                this.life = 1;
+                this.decay = Math.random() * 0.01 + 0.005;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life -= this.decay;
+
+                if (this.life <= 0) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                ctx.fillStyle = `rgba(255, 107, 107, ${this.life * 0.3})`;
+                ctx.fillRect(this.x, this.y, 2, 2);
+            }
+        }
+
+        // Game state
+        let plants = [];
+        let noiseParticles = [];
+        let globalEntropy = 0;
+        let isMouseDown = false;
+        let lastPlantTime = 0;
+
+        // Initialize noise
+        for (let i = 0; i < 200; i++) {
+            noiseParticles.push(new NoiseParticle());
+        }
+
+        // Mouse events
+        canvas.addEventListener('mousedown', (e) => {
+            isMouseDown = true;
+            cursor.classList.add('active');
+
+            // Plant new seed
+            const now = Date.now();
+            if (now - lastPlantTime > 300) {
+                plants.push(new Plant(e.clientX, e.clientY));
+                lastPlantTime = now;
+            }
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isMouseDown = false;
+            cursor.classList.remove('active');
+        });
+
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                // Prune all plants
+                plants.forEach(plant => plant.prune());
+                globalEntropy = Math.max(0, globalEntropy - 30);
+            }
+
+            if (e.key.toLowerCase() === 'r') {
+                // Reset garden
+                plants = [];
+                globalEntropy = 0;
+            }
+        });
+
+        // Update HUD
+        function updateHUD() {
+            const livingPlants = plants.filter(p => !p.dead).length;
+            document.getElementById('plant-count').textContent = livingPlants;
+
+            const entropyPercent = Math.min(100, globalEntropy);
+            document.getElementById('entropy-value').textContent = entropyPercent.toFixed(0);
+            document.getElementById('entropy-bar').style.width = entropyPercent + '%';
+
+            let status = 'CRESCENDO';
+            if (livingPlants === 0) status = 'VAZIO';
+            else if (entropyPercent > 70) status = 'CAÓTICO';
+            else if (entropyPercent < 30) status = 'HARMONIOSO';
+
+            document.getElementById('status').textContent = status;
+        }
+
+        // Animation loop
+        function animate() {
+            // Fade effect instead of clear
+            ctx.fillStyle = 'rgba(5, 5, 5, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Update and draw plants
+            plants.forEach(plant => {
+                if (isMouseDown) {
+                    // Water plants when holding mouse
+                    const dx = plant.x - mouseX;
+                    const dy = plant.y - mouseY;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < 100) {
+                        plant.grow(2);
+                    } else {
+                        plant.grow(0.5);
+                    }
+                } else {
+                    plant.grow(0.3);
+                }
+
+                plant.draw();
+            });
+
+            // Increase entropy over time
+            globalEntropy += 0.05;
+
+            // Apply entropy to plants
+            if (globalEntropy > 50) {
+                plants.forEach(plant => {
+                    if (Math.random() < 0.01) {
+                        plant.applyEntropy();
+                    }
+                });
+            }
+
+            // Draw noise particles (more when entropy is high)
+            const visibleParticles = Math.floor(noiseParticles.length * (globalEntropy / 100));
+            for (let i = 0; i < visibleParticles; i++) {
+                noiseParticles[i].update();
+                noiseParticles[i].draw();
+            }
+
+            updateHUD();
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Éter Digital — Experiência 2026</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,700&family=Inter:wght@300;400&family=JetBrains+Mono:wght@300;400&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050505;
+            --accent-color: #e2d1b1;
+            --text-color: #f5f5f5;
+            --error-color: #ff6b6b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            cursor: crosshair;
+        }
+
+        /* HUD Overlay */
+        #hud {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            pointer-events: none;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--accent-color);
+            opacity: 0.6;
+            padding: 20px;
+        }
+
+        .hud-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .coordinates {
+            text-align: left;
+        }
+
+        .system-info {
+            text-align: right;
+        }
+
+        .hud-line {
+            margin-bottom: 4px;
+            letter-spacing: 1px;
+        }
+
+        .blink {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            49% {
+                opacity: 1;
+            }
+
+            50%,
+            100% {
+                opacity: 0;
+            }
+        }
+
+        /* Canvas */
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        #scroll-wrapper {
+            position: relative;
+            z-index: 2;
+            height: 1000vh;
+        }
+
+        section {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 0 10%;
+        }
+
+        .poetic-content {
+            max-width: 500px;
+            opacity: 0;
+            transform: translateY(30px);
+            text-shadow: 0 2px 15px rgba(0, 0, 0, 1);
+            background: rgba(5, 5, 5, 0.7);
+            backdrop-filter: blur(15px);
+            padding: 40px;
+            border-radius: 12px;
+            border: 1px solid rgba(226, 209, 177, 0.15);
+            transition: border-color 0.3s ease;
+        }
+
+        .poetic-content:hover {
+            border-color: rgba(226, 209, 177, 0.4);
+        }
+
+        .poetic-content h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            color: var(--accent-color);
+            margin: 0 0 1.5rem 0;
+            line-height: 1.1;
+            overflow: hidden;
+        }
+
+        .poetic-content h1 .letter {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(100px) rotateX(90deg);
+        }
+
+        .poetic-content p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            opacity: 0.9;
+        }
+
+        .poetic-content p .word {
+            display: inline-block;
+            opacity: 0;
+        }
+
+        /* Return button */
+        .return-button {
+            margin-top: 2rem;
+            padding: 12px 30px;
+            background: transparent;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0;
+        }
+
+        .return-button:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            box-shadow: 0 0 20px rgba(226, 209, 177, 0.5);
+        }
+
+        /* Loading screen */
+        #loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-color);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'JetBrains Mono', monospace;
+            transition: opacity 0.5s ease;
+        }
+
+        #loading.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loader-text {
+            color: var(--accent-color);
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .loader-bar {
+            width: 300px;
+            height: 2px;
+            background: rgba(226, 209, 177, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loader-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: var(--accent-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Loading Screen -->
+    <div id="loading">
+        <div class="loader-text">INICIALIZANDO SISTEMA<span class="blink">_</span></div>
+        <div class="loader-bar">
+            <div class="loader-progress"></div>
+        </div>
+    </div>
+
+    <!-- HUD Overlay -->
+    <div id="hud">
+        <div class="hud-top">
+            <div class="coordinates">
+                <div class="hud-line">X: <span id="coord-x">0.000</span></div>
+                <div class="hud-line">Y: <span id="coord-y">0.000</span></div>
+                <div class="hud-line">Z: <span id="coord-z">0.100</span></div>
+            </div>
+            <div class="system-info">
+                <div class="hud-line">GENESIS.EXE</div>
+                <div class="hud-line">STATUS: <span style="color: #4ecca3;">ONLINE</span></div>
+                <div class="hud-line">ENTROPY: <span id="entropy">0.0</span>%</div>
+            </div>
+        </div>
+    </div>
+
+    <main id="scroll-wrapper">
+        <section>
+            <div class="poetic-content">
+                <h1 data-text="Genesis.exe">Genesis.exe</h1>
+                <p>No princípio, o bit era silêncio. Você não nasce com um propósito; nasce com um espaço vazio para ser
+                    preenchido.</p>
+            </div>
+        </section>
+
+        <section style="justify-content: flex-end;">
+            <div class="poetic-content">
+                <h1 data-text="while(true)">while(true)</h1>
+                <p>O ciclo não perdoa. O peso do erro não se apaga na próxima iteração; ele se torna a base de quem você
+                    é
+                    agora.</p>
+            </div>
+        </section>
+
+        <section style="justify-content: center;">
+            <div class="poetic-content" style="text-align: center;">
+                <h1 data-text="if / else">if / else</h1>
+                <p>Ninguém é seu inimigo por natureza. Cada bifurcação é uma escolha: ferir para se proteger ou ter a
+                    força
+                    de não revidar.</p>
+            </div>
+        </section>
+
+        <section>
+            <div class="poetic-content">
+                <h1 data-text="padding">padding</h1>
+                <p>Criei margens para não sentir a dor, mas acabei isolado da luz. Onde não há contato, não há vida.</p>
+            </div>
+        </section>
+
+        <section style="justify-content: flex-end;">
+            <div class="poetic-content">
+                <h1 data-text="return">return</h1>
+                <p>Voltar ao lar não é um recuo. É o momento em que o código finalmente encontra o seu repouso e o
+                    coração,
+                    sua paz.</p>
+            </div>
+        </section>
+
+        <section style="justify-content: center;">
+            <div class="poetic-content" style="text-align: center;">
+                <h1 data-text="Entropy++">Entropy++</h1>
+                <p>O sistema tende ao caos e tudo o que é sólido se desfaz. Lute. Mesmo que o fim seja o nada, cultive
+                    sua
+                    bondade hoje.</p>
+            </div>
+        </section>
+
+        <section>
+            <div class="poetic-content">
+                <h1 data-text="Timeout">Timeout</h1>
+                <p>O silêncio não é uma falha. Se o fardo exceder a sua força, descanse. O infinito compreende a
+                    brevidade
+                    do seu fôlego.</p>
+            </div>
+        </section>
+
+        <section>
+            <div class="poetic-content">
+                <h1 data-text="EOF">EOF</h1>
+                <p>Todo ciclo termina. Não com estrondo, mas com um sussurro. O que você construiu permanece, mesmo
+                    quando você não está mais aqui para vê-lo.</p>
+            </div>
+        </section>
+
+        <section style="justify-content: center;">
+            <div class="poetic-content" style="text-align: center;">
+                <h1 data-text="∞">∞</h1>
+                <p>E então, o sistema retorna ao vazio. Mas o vazio não é o fim — é a promessa de um novo início.</p>
+                <button class="return-button" onclick="window.location.href='index.html'">Retornar ao início</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <script>
+        // ===== LOADING SCREEN =====
+        let loadProgress = 0;
+        const loadingEl = document.getElementById('loading');
+        const progressBar = document.querySelector('.loader-progress');
+
+        function updateProgress(progress) {
+            loadProgress = progress;
+            progressBar.style.width = progress + '%';
+            if (progress >= 100) {
+                setTimeout(() => {
+                    loadingEl.classList.add('hidden');
+                }, 500);
+            }
+        }
+
+        // Simulate loading
+        let simLoad = 0;
+        const loadInterval = setInterval(() => {
+            simLoad += Math.random() * 15;
+            if (simLoad >= 100) {
+                simLoad = 100;
+                clearInterval(loadInterval);
+            }
+            updateProgress(simLoad);
+        }, 100);
+
+        gsap.registerPlugin(ScrollTrigger);
+
+        // ===== MOUSE TRACKING =====
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetMouseX = 0;
+        let targetMouseY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            targetMouseX = (e.clientX / window.innerWidth) * 2 - 1;
+            targetMouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+        });
+
+        // ===== THREE.JS SETUP =====
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.01, 3000);
+        camera.position.z = 0.1;
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        document.body.appendChild(renderer.domElement);
+
+        // ===== STAR TEXTURE =====
+        function createStarTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 128;
+            canvas.height = 128;
+            const ctx = canvas.getContext('2d');
+            const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 60);
+            grad.addColorStop(0, 'white');
+            grad.addColorStop(0.2, 'white');
+            grad.addColorStop(0.5, 'rgba(226, 209, 177, 0.4)');
+            grad.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(64, 64, 60, 0, Math.PI * 2);
+            ctx.fill();
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        // ===== STARFIELD =====
+        const starsGeom = new THREE.BufferGeometry();
+        const starsPos = [];
+        const starsSizes = [];
+        for (let i = 0; i < 18000; i++) {
+            starsPos.push((Math.random() - 0.5) * 1200);
+            starsPos.push((Math.random() - 0.5) * 1200);
+            starsPos.push((Math.random() - 0.5) * 2500);
+            starsSizes.push(Math.random() * 3 + 1);
+        }
+        starsGeom.setAttribute('position', new THREE.Float32BufferAttribute(starsPos, 3));
+        starsGeom.setAttribute('size', new THREE.Float32BufferAttribute(starsSizes, 1));
+
+        const starsMat = new THREE.PointsMaterial({
+            size: 4.0,
+            map: createStarTexture(),
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+            opacity: 0.8,
+            sizeAttenuation: true
+        });
+        const starField = new THREE.Points(starsGeom, starsMat);
+        scene.add(starField);
+
+        // ===== CORE PLANET =====
+        const coreGeom = new THREE.IcosahedronGeometry(1.5, 2);
+        const coreMat = new THREE.MeshBasicMaterial({
+            color: 0xe2d1b1,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.5
+        });
+        const core = new THREE.Mesh(coreGeom, coreMat);
+        scene.add(core);
+
+        // ===== GSAP SCROLL ANIMATION =====
+        const tl = gsap.timeline({
+            scrollTrigger: {
+                trigger: "#scroll-wrapper",
+                start: "top top",
+                end: "bottom bottom",
+                scrub: 2.5,
+                onUpdate: (self) => {
+                    // Update entropy display
+                    const entropy = (self.progress * 100).toFixed(1);
+                    document.getElementById('entropy').textContent = entropy;
+                }
+            }
+        });
+
+        tl.to(camera.position, { z: 150, ease: "power1.inOut" }, 0)
+            .to(core.rotation, { y: Math.PI * 1.5, ease: "none" }, 0)
+            .to(core.scale, { x: 0.008, y: 0.008, z: 0.008, ease: "power4.in" }, 0)
+            .to(coreMat, { opacity: 0.8, ease: "power2.in" }, 0);
+
+        // ===== TEXT ANIMATIONS =====
+        function splitTextIntoLetters(element) {
+            const text = element.getAttribute('data-text');
+            element.innerHTML = '';
+            for (let char of text) {
+                const span = document.createElement('span');
+                span.className = 'letter';
+                span.textContent = char === ' ' ? '\u00A0' : char;
+                element.appendChild(span);
+            }
+        }
+
+        function splitTextIntoWords(element) {
+            const text = element.textContent;
+            element.innerHTML = '';
+            const words = text.split(' ');
+            words.forEach((word, index) => {
+                const span = document.createElement('span');
+                span.className = 'word';
+                span.textContent = word;
+                element.appendChild(span);
+                if (index < words.length - 1) {
+                    element.appendChild(document.createTextNode(' '));
+                }
+            });
+        }
+
+        document.querySelectorAll('.poetic-content h1').forEach(splitTextIntoLetters);
+        document.querySelectorAll('.poetic-content p').forEach(splitTextIntoWords);
+
+        gsap.utils.toArray(".poetic-content").forEach((card) => {
+            const letters = card.querySelectorAll('.letter');
+            const words = card.querySelectorAll('.word');
+            const button = card.querySelector('.return-button');
+
+            gsap.to(card, {
+                opacity: 1,
+                y: 0,
+                scrollTrigger: {
+                    trigger: card,
+                    start: "top 85%",
+                    end: "top 20%",
+                    scrub: true
+                }
+            });
+
+            // Animate title letters (slower)
+            gsap.to(letters, {
+                opacity: 1,
+                y: 0,
+                rotateX: 0,
+                stagger: 0.05,
+                scrollTrigger: {
+                    trigger: card,
+                    start: "top 80%",
+                    end: "top 35%",
+                    scrub: 1.5
+                }
+            });
+
+            // Animate paragraph words (delayed after title, slower)
+            gsap.to(words, {
+                opacity: 0.9,
+                stagger: 0.04,
+                scrollTrigger: {
+                    trigger: card,
+                    start: "top 65%",
+                    end: "top 25%",
+                    scrub: 1.5
+                }
+            });
+
+            // Animate button (if exists)
+            if (button) {
+                gsap.to(button, {
+                    opacity: 1,
+                    scrollTrigger: {
+                        trigger: card,
+                        start: "top 50%",
+                        end: "top 20%",
+                        scrub: 1.5
+                    }
+                });
+            }
+        });
+
+        // ===== ANIMATION LOOP =====
+        function animate() {
+            // Smooth mouse following
+            mouseX += (targetMouseX - mouseX) * 0.05;
+            mouseY += (targetMouseY - mouseY) * 0.05;
+
+            // Parallax effect
+            starField.rotation.x = mouseY * 0.05;
+            starField.rotation.y = mouseX * 0.05;
+
+            core.rotation.y += 0.0015;
+            core.rotation.x += 0.0005;
+
+            // Mouse influence on core
+            core.rotation.y += mouseX * 0.001;
+            core.rotation.x += mouseY * 0.001;
+
+            starField.rotation.y += 0.0002;
+
+            // Update HUD
+            document.getElementById('coord-x').textContent = mouseX.toFixed(3);
+            document.getElementById('coord-y').textContent = mouseY.toFixed(3);
+            document.getElementById('coord-z').textContent = camera.position.z.toFixed(3);
+
+            renderer.render(scene, camera);
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // ===== RESIZE HANDLER =====
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+
+</html>

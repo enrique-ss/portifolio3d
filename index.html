@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Éter Digital — Sistema</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;1,700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #050505;
+            color: #e2d1b1;
+            font-family: 'JetBrains Mono', monospace;
+            overflow: hidden;
+            cursor: crosshair;
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        /* HUD */
+        #hud {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            font-size: 11px;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .hud-line {
+            margin-bottom: 4px;
+            letter-spacing: 1px;
+        }
+
+        /* Welcome screen */
+        #welcome {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 5, 5, 0.95);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease;
+        }
+
+        #welcome.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .welcome-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 5rem;
+            font-style: italic;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #e2d1b1, #4ecca3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            opacity: 0;
+            animation: fadeInUp 1s ease forwards;
+        }
+
+        .welcome-subtitle {
+            font-size: 14px;
+            letter-spacing: 3px;
+            opacity: 0;
+            text-transform: uppercase;
+            margin-bottom: 50px;
+            animation: fadeInUp 1s ease 0.3s forwards;
+        }
+
+        .welcome-instructions {
+            font-size: 13px;
+            text-align: center;
+            line-height: 2;
+            opacity: 0;
+            animation: fadeInUp 1s ease 0.6s forwards;
+        }
+
+        .instruction-line {
+            margin: 5px 0;
+        }
+
+        .key {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(226, 209, 177, 0.1);
+            border: 1px solid rgba(226, 209, 177, 0.3);
+            border-radius: 4px;
+            font-weight: 700;
+            margin: 0 5px;
+        }
+
+        .start-button {
+            margin-top: 40px;
+            padding: 15px 40px;
+            background: transparent;
+            border: 1px solid #e2d1b1;
+            color: #e2d1b1;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0;
+            animation: fadeInUp 1s ease 0.9s forwards;
+        }
+
+        .start-button:hover {
+            background: #e2d1b1;
+            color: #050505;
+            box-shadow: 0 0 30px rgba(226, 209, 177, 0.5);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Module info panel */
+        #info-panel {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            background: rgba(5, 5, 5, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(226, 209, 177, 0.3);
+            border-radius: 12px;
+            padding: 30px 40px;
+            max-width: 500px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        #info-panel.visible {
+            opacity: 1;
+        }
+
+        .info-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #e2d1b1;
+        }
+
+        .info-filename {
+            font-size: 11px;
+            color: #4ecca3;
+            margin-bottom: 15px;
+            opacity: 0.7;
+        }
+
+        .info-description {
+            font-size: 13px;
+            line-height: 1.6;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .info-action {
+            font-size: 12px;
+            opacity: 0.6;
+            text-align: center;
+        }
+
+        /* Navigation hint */
+        #nav-hint {
+            position: fixed;
+            top: 50%;
+            right: 40px;
+            transform: translateY(-50%);
+            z-index: 100;
+            font-size: 11px;
+            opacity: 0.4;
+            text-align: right;
+            pointer-events: none;
+        }
+
+        .hint-line {
+            margin: 10px 0;
+        }
+
+        /* Status indicator */
+        .status-dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #4ecca3;
+            margin-left: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                box-shadow: 0 0 10px #4ecca3;
+            }
+
+            50% {
+                opacity: 0.3;
+                box-shadow: 0 0 5px #4ecca3;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .welcome-title {
+                font-size: 3rem;
+            }
+
+            #info-panel {
+                width: 90%;
+                padding: 20px;
+            }
+
+            #nav-hint {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Welcome Screen -->
+    <div id="welcome">
+        <h1 class="welcome-title">Éter Digital</h1>
+        <p class="welcome-subtitle">Sistema Filosófico Interativo — 2026</p>
+        <div class="welcome-instructions">
+            <div class="instruction-line">Navegue pelo espaço usando <span class="key">MOUSE</span> para rotacionar
+            </div>
+            <div class="instruction-line">Use <span class="key">SCROLL</span> para aproximar/afastar</div>
+            <div class="instruction-line">Clique nos módulos <span class="key">◉</span> para acessá-los</div>
+        </div>
+        <button class="start-button" onclick="startExperience()">INICIAR EXPLORAÇÃO</button>
+    </div>
+
+    <!-- HUD -->
+    <div id="hud">
+        <div class="hud-line">ÉTER DIGITAL v1.0.0</div>
+        <div class="hud-line">MÓDULOS: <span id="module-count">3/4</span></div>
+        <div class="hud-line">STATUS: <span style="color: #4ecca3;">ONLINE</span><span class="status-dot"></span></div>
+        <div class="hud-line">CAM: <span id="cam-distance">5.0</span></div>
+    </div>
+
+    <!-- Navigation Hint -->
+    <div id="nav-hint">
+        <div class="hint-line">ARRASTE → ROTACIONAR</div>
+        <div class="hint-line">SCROLL → ZOOM</div>
+        <div class="hint-line">CLIQUE → ACESSAR</div>
+    </div>
+
+    <!-- Info Panel -->
+    <div id="info-panel">
+        <h2 class="info-title" id="info-title">Module Name</h2>
+        <div class="info-filename" id="info-filename">filename.ext</div>
+        <p class="info-description" id="info-description">Description</p>
+        <div class="info-action">CLIQUE PARA ACESSAR</div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <script>
+        // Module data
+        const modules = [
+            {
+                name: 'Genesis',
+                filename: '01_genesis.exe',
+                description: 'Uma jornada através do cosmos interior. Explore reflexões filosóficas enquanto navega por um universo de wireframe.',
+                url: 'eter-digital-enhanced.html',
+                position: { x: -8, y: 4, z: -3 },
+                color: 0xe2d1b1
+            },
+            {
+                name: 'The Debugger',
+                filename: '02_debugger.sh',
+                description: 'Terminal interativo que refatora pensamentos destrutivos. Digite seus erros e veja-os transformados em aprendizados.',
+                url: 'debugger.html',
+                position: { x: 7, y: -3, z: 5 },
+                color: 0x4ecca3
+            },
+            {
+                name: 'Neural Garden',
+                filename: '03_neural_garden.py',
+                description: 'Jardim generativo onde você cultiva ordem contra a entropia. Plante, regue e pode em uma metáfora viva.',
+                url: 'neural-garden.html',
+                position: { x: -5, y: -5, z: 8 },
+                color: 0xff6b9d
+            },
+            {
+                name: 'Latency of Being',
+                filename: '04_latency.bin',
+                description: '[EM DESENVOLVIMENTO] Viaje através de túneis de fibra ótica e explore memórias fragmentadas.',
+                url: null,
+                position: { x: 6, y: 5, z: -7 },
+                color: 0x666666,
+                disabled: true
+            }
+        ];
+
+        // Scene setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 15;
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        document.body.appendChild(renderer.domElement);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+        scene.add(ambientLight);
+
+        const pointLight = new THREE.PointLight(0xe2d1b1, 1, 100);
+        pointLight.position.set(5, 5, 5);
+        scene.add(pointLight);
+
+        // ===== STAR TEXTURE =====
+        function createStarTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 128;
+            canvas.height = 128;
+            const ctx = canvas.getContext('2d');
+            const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 60);
+            grad.addColorStop(0, 'white');
+            grad.addColorStop(0.2, 'white');
+            grad.addColorStop(0.5, 'rgba(226, 209, 177, 0.4)');
+            grad.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(64, 64, 60, 0, Math.PI * 2);
+            ctx.fill();
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        // Background stars
+        const starsGeom = new THREE.BufferGeometry();
+        const starsPos = [];
+        const starsSizes = [];
+        for (let i = 0; i < 18000; i++) {
+            starsPos.push((Math.random() - 0.5) * 1200);
+            starsPos.push((Math.random() - 0.5) * 1200);
+            starsPos.push((Math.random() - 0.5) * 2500);
+            starsSizes.push(Math.random() * 3 + 1);
+        }
+        starsGeom.setAttribute('position', new THREE.Float32BufferAttribute(starsPos, 3));
+        starsGeom.setAttribute('size', new THREE.Float32BufferAttribute(starsSizes, 1));
+
+        const starsMat = new THREE.PointsMaterial({
+            size: 4.0,
+            map: createStarTexture(),
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+            opacity: 0.8,
+            sizeAttenuation: true
+        });
+        const stars = new THREE.Points(starsGeom, starsMat);
+        scene.add(stars);
+
+        // Create module nodes
+        const moduleObjects = [];
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        let hoveredModule = null;
+
+        modules.forEach((module, index) => {
+            // Core sphere - larger like eter-digital
+            const geometry = new THREE.IcosahedronGeometry(0.8, 2);
+            const material = new THREE.MeshBasicMaterial({
+                color: module.color,
+                wireframe: true,
+                transparent: true,
+                opacity: module.disabled ? 0.3 : 0.5
+            });
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.position.set(module.position.x, module.position.y, module.position.z);
+            mesh.userData = { moduleIndex: index, module: module };
+            scene.add(mesh);
+
+            // Outer glow
+            const glowGeom = new THREE.IcosahedronGeometry(0.9, 2);
+            const glowMat = new THREE.MeshBasicMaterial({
+                color: module.color,
+                transparent: true,
+                opacity: module.disabled ? 0.05 : 0.1,
+                side: THREE.BackSide
+            });
+            const glow = new THREE.Mesh(glowGeom, glowMat);
+            mesh.add(glow);
+
+            // Particle ring
+            const ringParticles = new THREE.BufferGeometry();
+            const ringPos = [];
+            for (let i = 0; i < 500; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const radius = 1.3 + Math.random() * 0.3;
+                ringPos.push(Math.cos(angle) * radius);
+                ringPos.push((Math.random() - 0.5) * 0.1);
+                ringPos.push(Math.sin(angle) * radius);
+            }
+            ringParticles.setAttribute('position', new THREE.Float32BufferAttribute(ringPos, 3));
+            const ringMat = new THREE.PointsMaterial({
+                color: module.color,
+                size: 0.05,
+                transparent: true,
+                opacity: module.disabled ? 0.2 : 0.4,
+                blending: THREE.AdditiveBlending
+            });
+            const ring = new THREE.Points(ringParticles, ringMat);
+            scene.add(ring);
+            ring.position.copy(mesh.position);
+
+            moduleObjects.push({ mesh, glow, ring, module });
+        });
+
+        // Spaceship
+        let spaceship = null;
+        let isExperienceStarted = false;
+
+        // Mouse interaction
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+        let rotation = { x: 0, y: 0 };
+
+        document.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            previousMousePosition = { x: e.clientX, y: e.clientY };
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            // Update mouse for raycasting
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+            // Rotation
+            if (isDragging) {
+                const deltaMove = {
+                    x: e.clientX - previousMousePosition.x,
+                    y: e.clientY - previousMousePosition.y
+                };
+
+                rotation.y += deltaMove.x * 0.005;
+                rotation.x += deltaMove.y * 0.005;
+
+                previousMousePosition = { x: e.clientX, y: e.clientY };
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        // Zoom with scroll
+        document.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            camera.position.z += e.deltaY * 0.01;
+            camera.position.z = Math.max(8, Math.min(30, camera.position.z));
+        }, { passive: false });
+
+        // Click to navigate
+        document.addEventListener('click', (e) => {
+            if (isDragging || !isExperienceStarted) return;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(moduleObjects.map(m => m.mesh));
+
+            if (intersects.length > 0) {
+                const targetModule = intersects[0].object;
+                const module = targetModule.userData.module;
+                if (!module.disabled && module.url) {
+                    navigateToModule(targetModule, module.url);
+                }
+            }
+        });
+
+        // Navigate with spaceship animation
+        function navigateToModule(targetMesh, url) {
+            // Disable interactions
+            isExperienceStarted = false;
+            document.getElementById('info-panel').classList.remove('visible');
+
+            // Create spaceship
+            const shipGeometry = new THREE.ConeGeometry(0.1, 0.3, 4);
+            const shipMaterial = new THREE.MeshBasicMaterial({
+                color: 0xffffff,
+                wireframe: true
+            });
+            spaceship = new THREE.Mesh(shipGeometry, shipMaterial);
+
+            // Start position: far in space
+            const startPos = new THREE.Vector3(
+                (Math.random() - 0.5) * 40,
+                (Math.random() - 0.5) * 40,
+                -30
+            );
+            spaceship.position.copy(startPos);
+            scene.add(spaceship);
+
+            // Add trail particles
+            const trailGeometry = new THREE.BufferGeometry();
+            const trailPositions = [];
+            for (let i = 0; i < 20; i++) {
+                trailPositions.push(0, 0, 0);
+            }
+            trailGeometry.setAttribute('position', new THREE.Float32BufferAttribute(trailPositions, 3));
+            const trailMaterial = new THREE.PointsMaterial({
+                color: 0xffffff,
+                size: 0.1,
+                transparent: true,
+                opacity: 0.6
+            });
+            const trail = new THREE.Points(trailGeometry, trailMaterial);
+            scene.add(trail);
+
+            // Animate spaceship to target
+            const targetPos = targetMesh.position.clone();
+
+            gsap.to(spaceship.position, {
+                x: targetPos.x,
+                y: targetPos.y,
+                z: targetPos.z,
+                duration: 3,
+                ease: 'power2.inOut',
+                onUpdate: function () {
+                    // Point spaceship towards target
+                    spaceship.lookAt(targetPos);
+                    spaceship.rotation.x += Math.PI / 2;
+
+                    // Update trail
+                    const positions = trail.geometry.attributes.position.array;
+                    for (let i = positions.length - 3; i >= 3; i -= 3) {
+                        positions[i] = positions[i - 3];
+                        positions[i + 1] = positions[i - 2];
+                        positions[i + 2] = positions[i - 1];
+                    }
+                    positions[0] = spaceship.position.x;
+                    positions[1] = spaceship.position.y;
+                    positions[2] = spaceship.position.z;
+                    trail.geometry.attributes.position.needsUpdate = true;
+                },
+                onComplete: function () {
+                    // Flash effect on arrival
+                    gsap.to(targetMesh.material, {
+                        opacity: 1,
+                        duration: 0.2,
+                        yoyo: true,
+                        repeat: 3
+                    });
+
+                    // Fade out and navigate
+                    setTimeout(() => {
+                        gsap.to(document.body, {
+                            opacity: 0,
+                            duration: 0.5,
+                            onComplete: () => {
+                                window.location.href = url;
+                            }
+                        });
+                    }, 500);
+                }
+            });
+
+            // Spaceship pulse
+            gsap.to(spaceship.scale, {
+                x: 1.3,
+                y: 1.3,
+                z: 1.3,
+                duration: 0.3,
+                yoyo: true,
+                repeat: -1
+            });
+        }
+
+        // Hover detection
+        function updateHover() {
+            if (!isExperienceStarted) return;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(moduleObjects.map(m => m.mesh));
+
+            if (intersects.length > 0) {
+                const moduleIndex = intersects[0].object.userData.moduleIndex;
+                if (hoveredModule !== moduleIndex) {
+                    hoveredModule = moduleIndex;
+                    const module = modules[moduleIndex];
+
+                    document.getElementById('info-title').textContent = module.name;
+                    document.getElementById('info-filename').textContent = module.filename;
+                    document.getElementById('info-description').textContent = module.description;
+                    document.getElementById('info-panel').classList.add('visible');
+
+                    if (!module.disabled) {
+                        document.body.style.cursor = 'pointer';
+                    }
+                }
+            } else {
+                if (hoveredModule !== null) {
+                    hoveredModule = null;
+                    document.getElementById('info-panel').classList.remove('visible');
+                    document.body.style.cursor = 'crosshair';
+                }
+            }
+        }
+
+        // Animation loop
+        function animate() {
+            // Apply rotation to entire scene
+            scene.rotation.y = rotation.y;
+            scene.rotation.x = rotation.x;
+
+            const time = Date.now() * 0.0001;
+
+            // Rotate individual modules with orbital motion
+            moduleObjects.forEach((obj, i) => {
+                obj.mesh.rotation.y += 0.0015;
+                obj.mesh.rotation.x += 0.0005;
+                obj.ring.rotation.y += 0.002;
+
+                // Orbital motion - each module drifts slightly
+                const orbitSpeed = 0.1 + i * 0.05;
+                const orbitRadius = 0.3;
+                const driftX = Math.sin(time * orbitSpeed + i) * orbitRadius * 0.01;
+                const driftY = Math.cos(time * orbitSpeed * 0.7 + i) * orbitRadius * 0.01;
+                const driftZ = Math.sin(time * orbitSpeed * 0.5 + i) * orbitRadius * 0.01;
+
+                obj.mesh.position.x += driftX;
+                obj.mesh.position.y += driftY;
+                obj.mesh.position.z += driftZ;
+
+                // Update ring position to follow mesh
+                obj.ring.position.copy(obj.mesh.position);
+
+                // Pulse effect on glow
+                const pulse = Math.sin(Date.now() * 0.001 + i) * 0.1 + 1;
+                obj.glow.scale.set(pulse, pulse, pulse);
+            });
+
+            // Slow star rotation
+            stars.rotation.y += 0.0002;
+
+            // Update HUD
+            document.getElementById('cam-distance').textContent = camera.position.z.toFixed(1);
+
+            updateHover();
+            renderer.render(scene, camera);
+            requestAnimationFrame(animate);
+        }
+
+        // Start experience
+        function startExperience() {
+            document.getElementById('welcome').classList.add('hidden');
+            isExperienceStarted = true;
+            gsap.from(camera.position, {
+                z: 40,
+                duration: 2.5,
+                ease: 'power2.out'
+            });
+        }
+
+        // Window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Fade in on load
+        document.body.style.opacity = '0';
+        window.addEventListener('load', () => {
+            gsap.to(document.body, { opacity: 1, duration: 1 });
+        });
+
+        animate();
+    </script>
+</body>
+
+</html>

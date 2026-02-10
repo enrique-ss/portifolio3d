@@ -4,14 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formação — Enrique Silveira</title>
+    <title>Projetos — Enrique Silveira</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,700&family=Inter:wght@300;400&family=JetBrains+Mono:wght@300;400&display=swap"
         rel="stylesheet">
     <style>
         :root {
             --bg-color: #050505;
-            --accent-color: #4ecca3;
+            --accent-color: #fbbf24;
             --text-color: #f5f5f5;
         }
 
@@ -91,56 +91,98 @@
         }
 
         .poetic-content {
-            max-width: 700px;
+            max-width: 650px;
             opacity: 0;
             background: rgba(5, 5, 5, 0.85);
             backdrop-filter: blur(15px);
             padding: 40px;
             border-radius: 12px;
-            border: 1px solid rgba(78, 204, 163, 0.2);
+            border: 1px solid rgba(251, 191, 36, 0.2);
             transition: border-color 0.3s ease, transform 0.1s ease;
             transform-style: preserve-3d;
             will-change: transform;
         }
 
         .poetic-content:hover {
-            border-color: rgba(78, 204, 163, 0.5);
+            border-color: rgba(251, 191, 36, 0.5);
         }
 
         .poetic-content h1 {
             font-family: 'Playfair Display', serif;
-            font-size: 3rem;
+            font-size: 2.8rem;
             color: var(--accent-color);
-            margin: 0 0 1rem 0;
+            margin: 0 0 0.5rem 0;
+            line-height: 1.2;
         }
 
-        .poetic-content h2 {
-            font-family: 'Playfair Display', serif;
-            font-size: 2rem;
-            color: var(--accent-color);
-            margin: 2rem 0 1rem 0;
-        }
-
-        .meta {
-            color: var(--accent-color);
+        .poetic-content .meta {
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.75rem;
-            font-weight: 600;
-            margin-bottom: 0.75rem;
-            opacity: 0.8;
+            color: var(--accent-color);
+            opacity: 0.7;
+            margin-bottom: 1rem;
             letter-spacing: 1px;
-        }
-
-        .poetic-content h3 {
-            font-size: 1.3rem;
-            margin: 0.5rem 0 0.5rem 0;
         }
 
         .poetic-content p {
             font-size: 1rem;
             line-height: 1.8;
             opacity: 0.9;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tech-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tech-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            padding: 0.4rem 0.8rem;
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            border-radius: 6px;
+            color: var(--accent-color);
+        }
+
+        .project-links {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .project-link {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            padding: 0.7rem 1.5rem;
+            background: transparent;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: inline-block;
+        }
+
+        .project-link:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+        }
+
+        .project-link.primary {
+            background: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        .project-link.primary:hover {
+            background: transparent;
+            color: var(--accent-color);
         }
 
         .return-button {
@@ -160,7 +202,7 @@
         .return-button:hover {
             background: var(--accent-color);
             color: var(--bg-color);
-            box-shadow: 0 0 20px rgba(78, 204, 163, 0.5);
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
         }
 
         #loading {
@@ -193,7 +235,7 @@
         .loader-bar {
             width: 300px;
             height: 2px;
-            background: rgba(78, 204, 163, 0.2);
+            background: rgba(251, 191, 36, 0.2);
             position: relative;
             overflow: hidden;
         }
@@ -206,6 +248,40 @@
             background: var(--accent-color);
             width: 0%;
             transition: width 0.3s ease;
+        }
+
+        .status-badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            padding: 0.3rem 0.7rem;
+            border-radius: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .status-badge.complete {
+            background: rgba(34, 197, 94, 0.2);
+            color: rgb(34, 197, 94);
+            border: 1px solid rgb(34, 197, 94);
+        }
+
+        .status-badge.progress {
+            background: rgba(59, 130, 246, 0.2);
+            color: rgb(59, 130, 246);
+            border: 1px solid rgb(59, 130, 246);
+        }
+
+        .status-badge.moderate {
+            background: rgba(234, 179, 8, 0.2);
+            color: rgb(234, 179, 8);
+            border: 1px solid rgb(234, 179, 8);
+        }
+
+        .status-badge.early {
+            background: rgba(239, 68, 68, 0.2);
+            color: rgb(239, 68, 68);
+            border: 1px solid rgb(239, 68, 68);
         }
 
         @media (max-width: 768px) {
@@ -227,12 +303,13 @@
 <body>
     <!-- Loading Screen -->
     <div id="loading">
-        <div class="loader-text">CARREGANDO FORMAÇÃO<span class="blink">_</span></div>
+        <div class="loader-text">CARREGANDO PROJETOS<span class="blink">_</span></div>
         <div class="loader-bar">
             <div class="loader-progress"></div>
         </div>
     </div>
 
+    <!-- HUD Overlay -->
     <div id="hud">
         <div class="hud-top">
             <div>
@@ -241,88 +318,206 @@
                 <div class="hud-line">Z: <span id="coord-z">0.100</span></div>
             </div>
             <div style="text-align: right;">
-                <div class="hud-line">EDUCATION.DB</div>
-                <div class="hud-line">STATUS: <span style="color: #4ecca3;">ONLINE</span></div>
+                <div class="hud-line">PROJECTS.JSON</div>
+                <div class="hud-line">STATUS: <span style="color: #fbbf24;">COMPILED</span></div>
                 <div class="hud-line">PROGRESS: <span id="entropy">0.0</span>%</div>
             </div>
         </div>
     </div>
 
     <main id="scroll-wrapper">
-        <section>
-            <div class="poetic-content">
-                <h1>Ensino Superior</h1>
-                <span class="meta">2026 - Atualmente | IFSul</span>
-                <h3>Licenciatura em Computação</h3>
-                <p>Formação para atuar como professor de Computação na Educação Básica e Técnica. O curso une
-                    fundamentos técnicos (programação, banco de dados, redes, arquitetura de computadores,
-                    desenvolvimento de software) com conhecimentos pedagógicos (didática, metodologias de ensino,
-                    psicologia da educação, tecnologias educacionais).</p>
-            </div>
-        </section>
-
-        <section style="justify-content: flex-end;">
-            <div class="poetic-content">
-                <span class="meta">2022 - Em andamento | UniFacitie</span>
-                <h3>Análise e Desenvolvimento de Sistemas</h3>
-                <p>Criação, implementação e manutenção de sistemas computacionais, abrangendo programação, banco de
-                    dados, engenharia de software, redes de computadores e segurança da informação, com foco em
-                    desenvolver soluções tecnológicas para atender necessidades de empresas e usuários.</p>
-            </div>
-        </section>
-
+        <!-- Intro Section -->
         <section style="justify-content: center;">
             <div class="poetic-content" style="text-align: center;">
-                <span class="meta">2020 - Trancado | IFSul</span>
-                <h3>Sistemas para Internet</h3>
-                <p>Formação focada no desenvolvimento de aplicações e sistemas web, abordando fundamentos de
-                    programação, desenvolvimento front-end e back-end, bancos de dados, redes e tecnologias para a
-                    internet, com ênfase na criação de soluções web funcionais e responsivas.</p>
+                <h1>Projetos</h1>
+                <p>Cada linha de código é um fragmento da minha jornada. Do caos ao cosmos, da ideia à execução. Aqui
+                    está o que construí enquanto aprendo a criar mundos digitais.</p>
             </div>
         </section>
 
+        <!-- Project 1: Fatui Website -->
         <section>
             <div class="poetic-content">
-                <h2>Formação Complementar</h2>
-                <span class="meta">2026 - 2026 | Senac</span>
-                <h3>Juventude Digital - Programador Web</h3>
-                <p>Desenvolvimento de aplicações web com HTML, CSS, JavaScript e React.</p>
+                <h1>Fatui Website</h1>
+                <span class="status-badge progress">Em Progresso</span>
+                <p class="meta">PROJETO INTERATIVO • GENSHIN IMPACT</p>
+                <p>Site interativo dedicado aos Onze Mensageiros Fatui de Genshin Impact. Carrossel gótico com vídeos
+                    dinâmicos que muda automaticamente conforme você navega pelos personagens. Uma experiência visual
+                    imersiva que celebra os antagonistas mais carismáticos do jogo.</p>
+                <div class="tech-tags">
+                    <span class="tech-tag">HTML/CSS</span>
+                    <span class="tech-tag">JavaScript</span>
+                </div>
+                <div class="project-links">
+                    <a href="https://enrique-ss.github.io/fatui-website/" target="_blank"
+                        class="project-link primary">Ver Site ↗</a>
+                    <a href="https://github.com/enrique-ss/fatui-website" target="_blank" class="project-link">GitHub
+                        ↗</a>
+                </div>
             </div>
         </section>
 
+        <!-- Project 2: Anniversary Website -->
         <section style="justify-content: flex-end;">
             <div class="poetic-content">
-                <span class="meta">2025 - 2025 | Senac</span>
-                <h3>RSTI - Desenvolvimento Back End com Java</h3>
-                <p>Desenvolvimento de aplicações com JavaScript, TypeScript, HTML, CSS, Node.js e MySQL. Criação de APIs
-                    e trabalhar com bancos de dados.</p>
+                <h1>Aniversário de Namoro</h1>
+                <span class="status-badge complete">Completo</span>
+                <p class="meta">PROJETO PESSOAL • CELEBRAÇÃO</p>
+                <p>Uma experiência web criada para celebrar 2 anos de namoro. Coração pulsante interativo, galeria com
+                    100 fotos de momentos especiais, playlist integrada do Spotify, diversas cartas românticas,
+                    mensagens únicas que mudam a cada visita e muito mais. Cada detalhe foi pensado com carinho.</p>
+                <div class="tech-tags">
+                    <span class="tech-tag">HTML/CSS</span>
+                    <span class="tech-tag">JavaScript</span>
+                </div>
+                <div class="project-links">
+                    <a href="https://enrique-ss.github.io/aniversario-namoro/" target="_blank"
+                        class="project-link primary">Ver Site ↗</a>
+                    <a href="https://github.com/enrique-ss/aniversario-namoro" target="_blank"
+                        class="project-link">GitHub ↗</a>
+                </div>
             </div>
         </section>
 
+        <!-- Project 3: Fake Wallpaper -->
+        <section>
+            <div class="poetic-content">
+                <h1>Papel de Parede Falso</h1>
+                <span class="status-badge progress">Em Progresso</span>
+                <p class="meta">FERRAMENTA WEB • PERSONALIZAÇÃO</p>
+                <p>Transforme vídeos em wallpapers animados falsos para computadores que não deixam você personalizar a
+                    tela de fundo. Uma solução criativa para driblar limitações e adicionar vida à sua área de trabalho.
+                    Perfeito para ambientes restritos que precisam de um toque pessoal.</p>
+                <div class="tech-tags">
+                    <span class="tech-tag">HTML/CSS</span>
+                    <span class="tech-tag">JavaScript</span>
+                </div>
+                <div class="project-links">
+                    <a href="https://enrique-ss.github.io/fake-wallpaper/" target="_blank"
+                        class="project-link primary">Ver Site ↗</a>
+                    <a href="https://github.com/enrique-ss/fake-wallpaper" target="_blank" class="project-link">GitHub
+                        ↗</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Project 4: SGAM -->
+        <section style="justify-content: flex-end;">
+            <div class="poetic-content">
+                <h1>SGAM</h1>
+                <span class="status-badge early">Contribuição Inicial</span>
+                <p class="meta">SISTEMA EMPRESARIAL • PROJETO FINAL</p>
+                <p>O SGAM é um Sistema para Gerenciar Agências de Marketing. Foi o projeto final que participei no curso
+                    "RSTI Backend" do Senac. Desenvolvido a partir das necessidades reais da nossa cliente, o sistema
+                    oferece gerenciamento completo de projetos, clientes e equipes.</p>
+                <div class="tech-tags">
+                    <span class="tech-tag">MySQL</span>
+                    <span class="tech-tag">Express</span>
+                    <span class="tech-tag">Node.js</span>
+                    <span class="tech-tag">JWT</span>
+                    <span class="tech-tag">HTML/CSS</span>
+                </div>
+                <div class="project-links">
+                    <a href="https://github.com/enrique-ss/SGAM" target="_blank" class="project-link">GitHub ↗</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Project 5: Library API -->
+        <section>
+            <div class="poetic-content">
+                <h1>Biblioteca API com CLI e Web</h1>
+                <span class="status-badge progress">Em Progresso</span>
+                <p class="meta">SISTEMA FULL-STACK • BANCO DE DADOS</p>
+                <p>Sistema completo de biblioteca com backend robusto e frontend integrado. Possui autenticação segura
+                    de usuários, gerenciamento completo de acervo literário, administração de usuários e interação tanto
+                    via terminal (CLI) quanto por interface web. Um sistema profissional para gestão bibliotecária.</p>
+                <div class="tech-tags">
+                    <span class="tech-tag">TypeScript</span>
+                    <span class="tech-tag">MySQL</span>
+                    <span class="tech-tag">Express</span>
+                    <span class="tech-tag">Node.js</span>
+                    <span class="tech-tag">JWT</span>
+                    <span class="tech-tag">HTML/CSS</span>
+                </div>
+                <div class="project-links">
+                    <a href="https://github.com/enrique-ss/banco-de-dados-base-automatizada" target="_blank"
+                        class="project-link">GitHub ↗</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Project 6: Academic PDFs -->
+        <section style="justify-content: flex-end;">
+            <div class="poetic-content">
+                <h1>PDF's Acadêmicos</h1>
+                <span class="status-badge moderate">Desenvolvimento Avançado</span>
+                <p class="meta">FERRAMENTA ACADÊMICA • FORMATAÇÃO</p>
+                <p>Crie artigos científicos no padrão ABNT usando HTML e CSS como se estivesse fazendo um site. O
+                    documento já sai formatado e pronto para impressão ou conversão em PDF. Torna a criação de
+                    documentos acadêmicos mais acessível e menos intimidadora para estudantes.</p>
+                <div class="tech-tags">
+                    <span class="tech-tag">HTML/CSS</span>
+                </div>
+                <div class="project-links">
+                    <a href="https://enrique-ss.github.io/pdfs-academicos/" target="_blank"
+                        class="project-link primary">Ver Site ↗</a>
+                    <a href="https://github.com/enrique-ss/pdfs-academicos" target="_blank" class="project-link">GitHub
+                        ↗</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Project 7: Portfolio -->
+        <section>
+            <div class="poetic-content">
+                <h1>Portfólio Estático</h1>
+                <span class="status-badge complete">Completo</span>
+                <p class="meta">PORTFÓLIO PROFISSIONAL • APRESENTAÇÃO</p>
+                <p>Portfólio pessoal desenvolvido com HTML e CSS puro para apresentar minhas habilidades, experiências e
+                    projetos como desenvolvedor Full-Stack e futuro Professor. Design limpo e profissional, focado em
+                    acessibilidade e performance. Uma vitrine digital da minha jornada.</p>
+                <div class="tech-tags">
+                    <span class="tech-tag">HTML/CSS</span>
+                </div>
+                <div class="project-links">
+                    <a href="https://github.com/enrique-ss/portifolio" target="_blank" class="project-link">GitHub ↗</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Project 8: Educational Game -->
+        <section style="justify-content: flex-end;">
+            <div class="poetic-content">
+                <h1>Outro Nível Educação</h1>
+                <span class="status-badge moderate">Desenvolvimento Avançado</span>
+                <p class="meta">JOGO EDUCATIVO • APRENDIZAGEM</p>
+                <p>Um jogo educativo interativo onde crianças aprendem sobre Saúde, Esportes e Educação através de
+                    lições dinâmicas e quizzes divertidos. Gamificação aplicada ao ensino, tornando o aprendizado mais
+                    envolvente e efetivo. Educação e diversão em perfeita harmonia.</p>
+                <div class="tech-tags">
+                    <span class="tech-tag">HTML/CSS</span>
+                    <span class="tech-tag">JavaScript</span>
+                </div>
+                <div class="project-links">
+                    <a href="https://enrique-ss.github.io/outro-nivel-educacao/" target="_blank"
+                        class="project-link primary">Ver Site ↗</a>
+                    <a href="https://github.com/enrique-ss/outro-nivel-educacao" target="_blank"
+                        class="project-link">GitHub ↗</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Final Section -->
         <section style="justify-content: center;">
             <div class="poetic-content" style="text-align: center;">
-                <span class="meta">2022 - 2023 | Oracle - Alura</span>
-                <h3>Oracle Next Education</h3>
-                <p>Formação em Lógica de Programação, Java, Data Science, Inteligência Artificial, desenvolvimento
-                    pessoal e habilidades para o mercado. Trilhas técnicas de Back-end, Front-end e soft skills.</p>
-            </div>
-        </section>
-
-        <section>
-            <div class="poetic-content">
-                <span class="meta">2022 - 2022 | PROA</span>
-                <h3>Plataforma PROA</h3>
-                <p>Formação focada em desenvolvimento pessoal e preparação para o mercado de trabalho, com ênfase em
-                    comunicação, raciocínio lógico, projeto profissional, trabalho em equipe e empregabilidade.</p>
-            </div>
-        </section>
-
-        <section style="justify-content: flex-end;">
-            <div class="poetic-content">
-                <span class="meta">2022 - 2022 | Prefeitura de Pelotas</span>
-                <h3>Programa Start</h3>
-                <p>Curso de capacitação profissional e desenvolvimento pessoal para jovens, com ênfase em protagonismo,
-                    metodologias ativas, habilidades comportamentais e inserção no mercado de trabalho.</p>
+                <h1>Continua...</h1>
+                <p>Cada projeto é um passo em uma jornada infinita. O código nunca para de evoluir, e eu também não.
+                    Visite meu GitHub para acompanhar as próximas criações.</p>
+                <div class="project-links" style="justify-content: center; margin-top: 2rem;">
+                    <a href="https://github.com/enrique-ss" target="_blank" class="project-link primary">Ver Todos os
+                        Projetos ↗</a>
+                </div>
                 <button class="return-button" onclick="window.location.href='index.html'">Retornar ao Espaço</button>
             </div>
         </section>
@@ -331,6 +526,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
     <script>
         // ===== LOADING SCREEN =====
         let loadProgress = 0;
@@ -361,10 +557,14 @@
 
         // ===== MOUSE TRACKING =====
         let mouseX = 0, mouseY = 0, targetMouseX = 0, targetMouseY = 0;
+        let cardMouseX = 0, cardMouseY = 0;
 
         document.addEventListener('mousemove', (e) => {
             targetMouseX = (e.clientX / window.innerWidth) * 2 - 1;
             targetMouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+
+            cardMouseX = e.clientX;
+            cardMouseY = e.clientY;
         });
 
         // ===== THREE.JS SETUP =====
@@ -385,7 +585,7 @@
             const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 60);
             grad.addColorStop(0, 'white');
             grad.addColorStop(0.2, 'white');
-            grad.addColorStop(0.5, 'rgba(78,204,163,0.4)');
+            grad.addColorStop(0.5, 'rgba(251,191,36,0.4)');
             grad.addColorStop(1, 'rgba(0,0,0,0)');
             ctx.fillStyle = grad;
             ctx.beginPath();
@@ -417,7 +617,7 @@
 
         const coreGeom = new THREE.IcosahedronGeometry(1.5, 2);
         const coreMat = new THREE.MeshBasicMaterial({
-            color: 0x4ecca3,
+            color: 0xfbbf24,
             wireframe: true,
             transparent: true,
             opacity: 0.5
@@ -465,8 +665,8 @@
                 const centerX = rect.width / 2;
                 const centerY = rect.height / 2;
 
-                const rotateX = ((y - centerY) / centerY) * 10;
-                const rotateY = ((centerX - x) / centerX) * 10;
+                const rotateX = ((y - centerY) / centerY) * 10; // max 10deg
+                const rotateY = ((centerX - x) / centerX) * 10; // max 10deg
 
                 gsap.to(card, {
                     duration: 0.3,

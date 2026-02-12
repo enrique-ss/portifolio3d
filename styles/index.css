@@ -45,7 +45,7 @@
 /* Estado Ativo: Ambos rigorosamente com 0.4 de opacidade */
 #hud.visible,
 #nav-hint.visible {
-    opacity: 0.4 !important;
+    opacity: 0.8 !important;
 }
 
 .hud-line,

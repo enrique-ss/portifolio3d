@@ -27,20 +27,13 @@
     </div>
 
     <!-- HUD -->
-    <div id="hud">
-        <div class="hud-top">
-            <div>
-                <div class="hud-line">X: <span id="coord-x">0.000</span></div>
-                <div class="hud-line">Y: <span id="coord-y">0.000</span></div>
-                <div class="hud-line">Z: <span id="coord-z">0.100</span></div>
-            </div>
-            <div style="text-align: right;">
-                <div class="hud-line">EDUCATION.DB</div>
-                <div class="hud-line">STATUS: <span style="color: #4ecca3;">ONLINE</span></div>
-                <div class="hud-line">PROGRESS: <span id="entropy">0.0</span>%</div>
-            </div>
+    <div id="scroll-hint">
+        <div class="mouse-icon">
+            <div class="wheel"></div>
         </div>
+        <span class="scroll-text">Scroll para explorar</span>
     </div>
+    </main>
 
     <!-- Conteúdo -->
     <main id="scroll-wrapper" style="min-height: 1000vh;">
@@ -130,7 +123,6 @@
                 <button class="return-button" onclick="window.location.href='index.html'">Retornar ao Espaço</button>
             </div>
         </section>
-    </main>
 
     <!-- Bibliotecas Externas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>

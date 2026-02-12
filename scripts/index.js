@@ -2,8 +2,58 @@
    SCRIPT PARA INDEX.HTML
 ======================================== */
 
-import { createStarField } from './shared-functions.js';
 import { INDEX_MODULES } from './config.js';
+
+/* ========================================
+   FUNÇÃO PARA CRIAR CAMPO DE ESTRELAS
+======================================== */
+function createStarField(starCount, color) {
+    // Criar textura
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 128;
+    const ctx = canvas.getContext('2d');
+
+    const gradient = ctx.createRadialGradient(64, 64, 0, 64, 64, 60);
+    gradient.addColorStop(0, 'white');
+    gradient.addColorStop(0.2, 'white');
+    gradient.addColorStop(0.5, color);
+    gradient.addColorStop(1, 'rgba(0,0,0,0)');
+
+    ctx.fillStyle = gradient;
+    ctx.arc(64, 64, 60, 0, Math.PI * 2);
+    ctx.fill();
+
+    const texture = new THREE.CanvasTexture(canvas);
+
+    // Criar geometria
+    const starsGeometry = new THREE.BufferGeometry();
+    const starsPositions = [];
+    const starsSizes = [];
+
+    for (let i = 0; i < starCount; i++) {
+        starsPositions.push(
+            (Math.random() - 0.5) * 1200,
+            (Math.random() - 0.5) * 1200,
+            (Math.random() - 0.5) * 2500
+        );
+        starsSizes.push(Math.random() * 3 + 1);
+    }
+
+    starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starsPositions, 3));
+    starsGeometry.setAttribute('size', new THREE.Float32BufferAttribute(starsSizes, 1));
+
+    const starsMaterial = new THREE.PointsMaterial({
+        size: 4.0,
+        map: texture,
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        opacity: 0.8,
+        sizeAttenuation: true
+    });
+
+    return new THREE.Points(starsGeometry, starsMaterial);
+}
 
 /* ========================================
    CONFIGURAÇÃO DA CENA THREE.JS
@@ -103,13 +153,14 @@ let previousMousePosition = { x: 0, y: 0 };
 let rotation = { x: 0, y: 0 };
 
 const profileCard = document.getElementById('profile-card');
+const profileCardContainer = document.getElementById('profile-card-container');
 
 /* ========================================
    FUNÇÕES DE CONTROLE
 ======================================== */
 function startExploration() {
     isExperienceStarted = true;
-    document.getElementById('profile-card-container').classList.add('hidden');
+    profileCardContainer.classList.add('hidden');
     document.getElementById('profile-overlay').classList.add('hidden');
     document.getElementById('hud').classList.add('visible');
     document.getElementById('nav-hint').classList.add('visible');
@@ -117,7 +168,7 @@ function startExploration() {
 
 function returnToCard() {
     isExperienceStarted = false;
-    document.getElementById('profile-card-container').classList.remove('hidden');
+    profileCardContainer.classList.remove('hidden');
     document.getElementById('profile-overlay').classList.remove('hidden');
     document.getElementById('hud').classList.remove('visible');
     document.getElementById('nav-hint').classList.remove('visible');

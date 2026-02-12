@@ -1,22 +1,108 @@
 /* ========================================
-   ESTILOS ESPECÍFICOS INDEX.HTML
+   ESTILOS GERAIS E VARIÁVEIS (BASE)
+======================================== */
+:root {
+    --z-overlay: 100;
+    --z-card: 200;
+    --z-hud: 300;
+    --transition-slow: 0.8s;
+    --transition-base: 0.3s;
+    --transition-fast: 0.1s;
+    --accent-rgb: 226, 209, 177;
+    --neutral: #e2d1b1;
+    --bg: #050505;
+    --radius-lg: 20px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+    --space-2: 8px;
+    --space-3: 16px;
+    --space-4: 24px;
+    --space-5: 32px;
+    --font-mono: 'JetBrains Mono', monospace;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg);
+    color: white;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+    height: 100vh;
+}
+
+/* ========================================
+   HUD E NAV-HINT (SINCRONIA TOTAL)
 ======================================== */
 
-/* Overlay */
+#hud,
+#nav-hint {
+    position: fixed;
+    z-index: var(--z-hud);
+
+    /* Tipografia e Cores */
+    font-family: var(--font-mono);
+    color: var(--neutral);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    line-height: 1.5;
+
+    /* Efeito visual de profundidade */
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+
+    /* Visibilidade (Igualando a Opacidade) */
+    pointer-events: none;
+    transition: opacity var(--transition-slow);
+    opacity: 0;
+}
+
+#hud {
+    top: 40px;
+    left: 40px;
+    text-align: left;
+}
+
+#nav-hint {
+    top: 50%;
+    right: 40px;
+    transform: translateY(-50%);
+    text-align: right;
+}
+
+/* Estado Ativo (Ambos com 0.4 de opacidade) */
+#hud.visible,
+#nav-hint.visible {
+    opacity: 0.4 !important;
+}
+
+.hud-line,
+.hint-line {
+    margin: var(--space-2) 0;
+}
+
+/* ========================================
+   OVERLAY E CARD DE PERFIL
+======================================== */
+
 #profile-overlay {
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.85);
     z-index: var(--z-overlay);
-    transition: opacity var(--transition-slow);
+    transition: opacity var(--transition-slow), visibility var(--transition-slow);
     pointer-events: none;
 }
 
 #profile-overlay.hidden {
     opacity: 0;
+    visibility: hidden;
 }
 
-/* Container do Card */
 #profile-card-container {
     position: fixed;
     top: 50%;
@@ -25,16 +111,14 @@
     z-index: var(--z-card);
     width: 90%;
     max-width: 420px;
-    /* REDUZIDO de 500px */
     perspective: 1500px;
-    transition: opacity var(--transition-slow);
-    pointer-events: auto;
-    /* IMPORTANTE: permite interação */
+    transition: opacity var(--transition-slow), visibility var(--transition-slow);
 }
 
 #profile-card-container.hidden {
     opacity: 0;
-    pointer-events: none;
+    pointer-events: none !important;
+    visibility: hidden;
 }
 
 #profile-card {
@@ -42,8 +126,6 @@
     width: 100%;
     transform-style: preserve-3d;
     transition: transform var(--transition-fast) linear;
-    pointer-events: auto;
-    /* IMPORTANTE */
 }
 
 .card-face {
@@ -55,11 +137,8 @@
     border: 2px solid rgba(226, 209, 177, 0.3);
     border-radius: var(--radius-lg);
     padding: var(--space-4);
-    /* REDUZIDO de var(--space-5) */
     text-align: center;
     transition: border-color var(--transition-base);
-    pointer-events: auto;
-    /* IMPORTANTE */
 }
 
 .card-face:hover {
@@ -77,53 +156,43 @@
     transform: rotateY(180deg);
 }
 
-/* Elementos do Card */
+/* Itens do Card */
 .profile-card__image {
     width: 100px;
-    /* REDUZIDO de 120px */
     height: 100px;
     border-radius: 50%;
     border: 3px solid rgba(var(--accent-rgb), 0.5);
     margin: 0 auto var(--space-2);
-    /* REDUZIDO */
     object-fit: cover;
 }
 
 .profile-card__name {
     font-size: 1.6rem;
-    /* REDUZIDO de 2rem */
     margin-bottom: var(--space-2);
 }
 
 .profile-card__role {
     margin-bottom: var(--space-3);
     font-size: 0.85rem;
-    /* REDUZIDO */
 }
 
 .profile-card__bio {
     font-size: 0.85rem;
-    /* REDUZIDO de 0.95rem */
     line-height: 1.5;
-    /* REDUZIDO de 1.6 */
     color: rgba(255, 255, 255, 0.8);
     margin-bottom: 20px;
-    /* REDUZIDO de 25px */
 }
 
 .profile-card__social {
     display: flex;
     justify-content: center;
     gap: 12px;
-    /* REDUZIDO de 15px */
     margin-bottom: 20px;
-    /* REDUZIDO de 30px */
     flex-wrap: wrap;
 }
 
 .profile-social-link {
     width: 44px;
-    /* REDUZIDO de 50px */
     height: 44px;
     display: flex;
     align-items: center;
@@ -133,12 +202,6 @@
     border-radius: var(--radius-sm);
     transition: all var(--transition-base);
     text-decoration: none;
-    font-size: 1.2rem;
-    /* REDUZIDO de 1.4rem */
-    pointer-events: auto;
-    /* IMPORTANTE */
-    cursor: pointer;
-    /* IMPORTANTE */
 }
 
 .profile-social-link:hover {
@@ -149,36 +212,31 @@
 
 .profile-social-link img {
     width: 22px;
-    /* REDUZIDO de 24px */
     height: 22px;
     object-fit: contain;
 }
 
+/* Lado B (Secret) */
 .secret-title {
     color: #ff6b9d;
     font-size: 1.6rem;
-    /* REDUZIDO */
     margin-bottom: var(--space-2);
 }
 
 .secret-subtitle {
     color: rgba(255, 107, 157, 0.7);
     margin-bottom: 20px;
-    /* REDUZIDO de 25px */
     font-size: 0.75rem;
-    /* REDUZIDO */
 }
 
 /* Botão Explorar */
 .explore-button {
     padding: 12px 40px;
-    /* REDUZIDO de 15px 50px */
     background: transparent;
     border: 2px solid var(--neutral);
     color: var(--neutral);
     font-family: var(--font-mono);
     font-size: 0.9rem;
-    /* REDUZIDO de 1rem */
     font-weight: 700;
     cursor: pointer;
     transition: all var(--transition-base);
@@ -187,8 +245,6 @@
     border-radius: var(--radius-sm);
     position: relative;
     overflow: hidden;
-    pointer-events: auto;
-    /* IMPORTANTE */
 }
 
 .explore-button::before {
@@ -216,7 +272,7 @@
     box-shadow: 0 0 30px rgba(226, 209, 177, 0.5);
 }
 
-/* Painel de Info do Módulo */
+/* Painel de Info */
 #info-panel {
     position: fixed;
     bottom: 40px;
@@ -240,10 +296,14 @@
 
 .info-title {
     font-size: 2rem;
+    color: var(--neutral);
 }
 
 .info-filename {
     margin-bottom: 15px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    opacity: 0.7;
 }
 
 .info-description {
@@ -254,60 +314,25 @@
 }
 
 .info-action {
-    font-size: 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
     opacity: 0.6;
     text-align: center;
+    letter-spacing: 2px;
 }
 
-/* Dicas de Navegação */
-#nav-hint {
-    position: fixed;
-    top: 50%;
-    right: 40px;
-    transform: translateY(-50%);
-    z-index: var(--z-hud);
-    font-size: 11px;
-    opacity: 0;
-    text-align: right;
-    pointer-events: none;
-    transition: opacity var(--transition-slow);
-}
-
-#nav-hint.visible {
-    opacity: 0.4;
-}
-
-.hint-line {
-    margin: var(--space-2) 0;
-}
-
-/* Responsivo */
+/* Responsividade */
 @media (max-width: 768px) {
     #profile-card-container {
         max-width: 360px;
-        /* Ainda menor no mobile */
     }
 
-    .card-face {
-        padding: var(--space-3);
+    #hud {
+        top: 20px;
+        left: 20px;
     }
 
-    #info-panel {
-        width: 90%;
-        padding: var(--space-3);
-    }
-
-    .profile-card__name,
-    .secret-title {
-        font-size: 1.4rem;
-    }
-
-    .profile-card__bio {
-        font-size: 0.8rem;
-    }
-
-    .explore-button {
-        padding: 10px 30px;
-        font-size: 0.85rem;
+    #nav-hint {
+        right: 20px;
     }
 }

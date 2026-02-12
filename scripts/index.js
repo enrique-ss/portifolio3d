@@ -1,5 +1,5 @@
 /* ========================================
-   SCRIPT PARA INDEX.HTML
+   SCRIPT PARA INDEX.HTML (CORRIGIDO)
 ======================================== */
 
 import { INDEX_MODULES } from './config.js';
@@ -8,7 +8,6 @@ import { INDEX_MODULES } from './config.js';
    FUNÇÃO PARA CRIAR CAMPO DE ESTRELAS
 ======================================== */
 function createStarField(starCount, color) {
-    // Criar textura
     const canvas = document.createElement('canvas');
     canvas.width = canvas.height = 128;
     const ctx = canvas.getContext('2d');
@@ -20,12 +19,12 @@ function createStarField(starCount, color) {
     gradient.addColorStop(1, 'rgba(0,0,0,0)');
 
     ctx.fillStyle = gradient;
+    ctx.beginPath();
     ctx.arc(64, 64, 60, 0, Math.PI * 2);
     ctx.fill();
 
     const texture = new THREE.CanvasTexture(canvas);
 
-    // Criar geometria
     const starsGeometry = new THREE.BufferGeometry();
     const starsPositions = [];
     const starsSizes = [];
@@ -67,9 +66,6 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 document.body.appendChild(renderer.domElement);
 
-/* ========================================
-   ILUMINAÇÃO DA CENA
-======================================== */
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
 scene.add(ambientLight);
 
@@ -77,9 +73,6 @@ const pointLight = new THREE.PointLight(0xe2d1b1, 1, 100);
 pointLight.position.set(5, 5, 5);
 scene.add(pointLight);
 
-/* ========================================
-   CRIAÇÃO DO CAMPO DE ESTRELAS
-======================================== */
 const stars = createStarField(18000, 'rgba(226, 209, 177, 0.4)');
 scene.add(stars);
 
@@ -92,7 +85,6 @@ const mouse = new THREE.Vector2();
 let hoveredModule = null;
 
 INDEX_MODULES.forEach((module, index) => {
-    // Geometria principal do módulo
     const geometry = new THREE.IcosahedronGeometry(0.8, 2);
     const material = new THREE.MeshBasicMaterial({
         color: module.color,
@@ -105,7 +97,6 @@ INDEX_MODULES.forEach((module, index) => {
     mesh.userData = { moduleIndex: index, module: module };
     scene.add(mesh);
 
-    // Efeito de brilho
     const glowGeometry = new THREE.IcosahedronGeometry(0.9, 2);
     const glowMaterial = new THREE.MeshBasicMaterial({
         color: module.color,
@@ -116,7 +107,6 @@ INDEX_MODULES.forEach((module, index) => {
     const glow = new THREE.Mesh(glowGeometry, glowMaterial);
     mesh.add(glow);
 
-    // Anel de partículas
     const ringGeometry = new THREE.BufferGeometry();
     const ringPositions = [];
     for (let i = 0; i < 500; i++) {
@@ -144,7 +134,7 @@ INDEX_MODULES.forEach((module, index) => {
 });
 
 /* ========================================
-   VARIÁVEIS DE ESTADO
+   VARIÁVEIS DE ESTADO E ELEMENTOS UI
 ======================================== */
 let spaceship = null;
 let isExperienceStarted = false;
@@ -154,29 +144,41 @@ let rotation = { x: 0, y: 0 };
 
 const profileCard = document.getElementById('profile-card');
 const profileCardContainer = document.getElementById('profile-card-container');
+const profileOverlay = document.getElementById('profile-overlay');
 
 /* ========================================
    FUNÇÕES DE CONTROLE
 ======================================== */
 function startExploration() {
+    if (isExperienceStarted) return; // Evita múltiplas chamadas
+
     isExperienceStarted = true;
     profileCardContainer.classList.add('hidden');
-    document.getElementById('profile-overlay').classList.add('hidden');
+    profileOverlay.classList.add('hidden');
+
     document.getElementById('hud').classList.add('visible');
     document.getElementById('nav-hint').classList.add('visible');
+    document.body.style.cursor = 'crosshair';
 }
 
 function returnToCard() {
     isExperienceStarted = false;
     profileCardContainer.classList.remove('hidden');
-    document.getElementById('profile-overlay').classList.remove('hidden');
+    profileOverlay.classList.remove('hidden');
+
     document.getElementById('hud').classList.remove('visible');
     document.getElementById('nav-hint').classList.remove('visible');
     document.getElementById('info-panel').classList.remove('visible');
+    document.body.style.cursor = 'default';
 }
 
-document.getElementById('explore-btn').addEventListener('click', startExploration);
-document.getElementById('explore-btn-back').addEventListener('click', startExploration);
+// Escuta cliques nos botões de exploração (Frente e Verso)
+document.querySelectorAll('.explore-button').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Impede o clique de passar para o canvas
+        startExploration();
+    });
+});
 
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && isExperienceStarted) {
@@ -213,15 +215,15 @@ document.addEventListener('mouseup', () => {
 
 document.addEventListener('wheel', (e) => {
     if (!isExperienceStarted) return;
-    e.preventDefault();
     camera.position.z += e.deltaY * 0.01;
     camera.position.z = Math.max(8, Math.min(30, camera.position.z));
-}, { passive: false });
+}, { passive: true });
 
 /* ========================================
-   NAVEGAÇÃO
+   NAVEGAÇÃO INTERPLANETÁRIA
 ======================================== */
-document.addEventListener('click', (e) => {
+document.addEventListener('click', () => {
+    // Só processa cliques no cenário se a experiência começou
     if (isDragging || !isExperienceStarted) return;
 
     raycaster.setFromCamera(mouse, camera);
@@ -237,27 +239,20 @@ document.addEventListener('click', (e) => {
 });
 
 function navigateToModule(targetMesh, url) {
-    isExperienceStarted = false;
+    isExperienceStarted = false; // Trava interações durante a animação
     document.getElementById('info-panel').classList.remove('visible');
 
     const shipGeometry = new THREE.ConeGeometry(0.1, 0.3, 4);
     const shipMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true });
     spaceship = new THREE.Mesh(shipGeometry, shipMaterial);
 
-    const startPos = new THREE.Vector3(
-        (Math.random() - 0.5) * 40,
-        (Math.random() - 0.5) * 40,
-        -30
-    );
+    const startPos = new THREE.Vector3((Math.random() - 0.5) * 40, (Math.random() - 0.5) * 40, -30);
     spaceship.position.copy(startPos);
     scene.add(spaceship);
 
     const trailGeometry = new THREE.BufferGeometry();
-    const trailPositions = [];
-    for (let i = 0; i < 20; i++) {
-        trailPositions.push(0, 0, 0);
-    }
-    trailGeometry.setAttribute('position', new THREE.Float32BufferAttribute(trailPositions, 3));
+    const trailPositions = new Float32Array(60);
+    trailGeometry.setAttribute('position', new THREE.BufferAttribute(trailPositions, 3));
 
     const trailMaterial = new THREE.PointsMaterial({
         color: 0xffffff,
@@ -309,19 +304,10 @@ function navigateToModule(targetMesh, url) {
             }, 500);
         }
     });
-
-    gsap.to(spaceship.scale, {
-        x: 1.3,
-        y: 1.3,
-        z: 1.3,
-        duration: 0.3,
-        yoyo: true,
-        repeat: -1
-    });
 }
 
 /* ========================================
-   HOVER
+   HOVER E UI
 ======================================== */
 function updateHover() {
     if (!isExperienceStarted) return;
@@ -356,7 +342,8 @@ function updateHover() {
 ======================================== */
 function animate() {
     if (!isExperienceStarted) {
-        profileCard.style.transform = `rotateY(${rotation.y * 100}deg) rotateX(${-rotation.x * 100}deg)`;
+        // Efeito de inclinação suave no card baseado na rotação da cena
+        profileCard.style.transform = `rotateY(${rotation.y * 10}deg) rotateX(${-rotation.x * 10}deg)`;
     }
 
     scene.rotation.y = rotation.y;
@@ -369,14 +356,11 @@ function animate() {
         obj.ring.rotation.y += 0.002;
 
         const orbitSpeed = 0.1 + i * 0.05;
-        const orbitRadius = 0.3;
-        const driftX = Math.sin(time * orbitSpeed + i) * orbitRadius * 0.01;
-        const driftY = Math.cos(time * orbitSpeed * 0.7 + i) * orbitRadius * 0.01;
-        const driftZ = Math.sin(time * orbitSpeed * 0.5 + i) * orbitRadius * 0.01;
+        const driftX = Math.sin(time * orbitSpeed + i) * 0.003;
+        const driftY = Math.cos(time * orbitSpeed * 0.7 + i) * 0.003;
 
         obj.mesh.position.x += driftX;
         obj.mesh.position.y += driftY;
-        obj.mesh.position.z += driftZ;
         obj.ring.position.copy(obj.mesh.position);
 
         const pulse = Math.sin(Date.now() * 0.001 + i) * 0.1 + 1;
@@ -384,7 +368,6 @@ function animate() {
     });
 
     stars.rotation.y += 0.0002;
-    document.getElementById('cam-distance').textContent = camera.position.z.toFixed(1);
 
     updateHover();
     renderer.render(scene, camera);
@@ -392,7 +375,7 @@ function animate() {
 }
 
 /* ========================================
-   RESPONSIVIDADE
+   EVENTOS GERAIS
 ======================================== */
 window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -400,12 +383,10 @@ window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-/* ========================================
-   INICIALIZAÇÃO
-======================================== */
-document.body.style.opacity = '0';
 window.addEventListener('load', () => {
     gsap.to(document.body, { opacity: 1, duration: 1 });
 });
 
+// Inicialização
+document.body.style.opacity = '0';
 animate();

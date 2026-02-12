@@ -1,0 +1,276 @@
+/* ========================================
+   ESTILOS GLOBAIS COMPARTILHADOS
+======================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+    cursor: crosshair;
+}
+
+/* ========================================
+   CANVAS THREE.JS
+======================================== */
+canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: var(--z-canvas);
+}
+
+/* ========================================
+   HUD (INFORMAÇÕES NO TOPO)
+======================================== */
+#hud {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: var(--z-hud);
+    pointer-events: none;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    opacity: 0;
+    padding: var(--spacing-md);
+    transition: opacity var(--transition-slow);
+}
+
+#hud.visible {
+    opacity: 0.6;
+}
+
+.hud-top {
+    display: flex;
+    justify-content: space-between;
+}
+
+.hud-line {
+    margin-bottom: var(--spacing-xs);
+    letter-spacing: 1px;
+}
+
+/* ========================================
+   LOADING SCREEN
+======================================== */
+#loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg-color);
+    z-index: var(--z-loading);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: var(--font-mono);
+    transition: opacity var(--transition-slow);
+}
+
+#loading.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.loader-text {
+    font-size: 14px;
+    margin-bottom: var(--spacing-md);
+}
+
+.loader-bar {
+    width: 300px;
+    height: 2px;
+    position: relative;
+    overflow: hidden;
+}
+
+.loader-progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0%;
+    transition: width var(--transition-normal);
+}
+
+/* ========================================
+   SCROLL WRAPPER
+======================================== */
+#scroll-wrapper {
+    position: relative;
+    z-index: var(--z-content);
+}
+
+/* ========================================
+   SECTIONS
+======================================== */
+section {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10%;
+}
+
+/* ========================================
+   CONTENT CARDS
+======================================== */
+.content-card,
+.poetic-content {
+    max-width: 700px;
+    opacity: 0;
+    background: rgba(5, 5, 5, 0.85);
+    backdrop-filter: blur(15px);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-md);
+    border: 1px solid;
+    text-align: center;
+    transition: border-color var(--transition-normal), transform var(--transition-fast);
+    transform-style: preserve-3d;
+    will-change: transform;
+}
+
+.content-card h1,
+.poetic-content h1 {
+    font-family: var(--font-display);
+    font-size: var(--font-size-h1);
+    margin: 0 0 1rem 0;
+}
+
+.content-card h2,
+.poetic-content h2 {
+    font-family: var(--font-display);
+    font-size: var(--font-size-h2);
+    margin: 2rem 0 1rem 0;
+}
+
+.content-card h3,
+.poetic-content h3 {
+    font-size: var(--font-size-h3);
+    margin: 0.5rem 0;
+}
+
+.content-card p,
+.poetic-content p {
+    font-size: var(--font-size-base);
+    line-height: 1.8;
+    opacity: 0.9;
+    margin-bottom: 1rem;
+}
+
+.meta {
+    color: inherit;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-small);
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    opacity: 0.8;
+    letter-spacing: 1px;
+}
+
+/* ========================================
+   BOTÕES
+======================================== */
+.return-button,
+.explore-button,
+.project-link {
+    padding: 12px 30px;
+    background: transparent;
+    border: 1px solid;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-radius: var(--border-radius-sm);
+    text-decoration: none;
+    display: inline-block;
+}
+
+.return-button,
+.explore-button {
+    margin-top: 2rem;
+}
+
+.project-link {
+    padding: 0.7rem 1.5rem;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+}
+
+/* ========================================
+   ANIMAÇÕES
+======================================== */
+.blink {
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+
+    0%,
+    49% {
+        opacity: 1;
+    }
+
+    50%,
+    100% {
+        opacity: 0;
+    }
+}
+
+.status-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-left: 8px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.3;
+    }
+}
+
+/* ========================================
+   RESPONSIVIDADE
+======================================== */
+@media (max-width: 768px) {
+
+    .content-card,
+    .poetic-content {
+        padding: 30px;
+    }
+
+    .content-card h1,
+    .poetic-content h1 {
+        font-size: var(--font-size-h1-mobile);
+    }
+
+    section {
+        padding: 0 5%;
+    }
+
+    .explore-button,
+    .return-button {
+        padding: 12px 35px;
+        font-size: 0.9rem;
+    }
+}

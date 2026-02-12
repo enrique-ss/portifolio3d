@@ -1,0 +1,60 @@
+/* ========================================
+   VARIÁVEIS GLOBAIS CSS
+======================================== */
+
+:root {
+    /* Cores Base */
+    --bg-color: #050505;
+    --text-color: #f5f5f5;
+    --neutral-color: #e2d1b1;
+
+    /* Cores de Acento por Página */
+    --accent-experiencias: #ff6b9d;
+    --accent-formacao: #4ecca3;
+    --accent-projetos: #fbbf24;
+    --accent-index: #e2d1b1;
+
+    /* Fontes */
+    --font-display: 'Playfair Display', serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    /* Tamanhos de Fonte */
+    --font-size-small: 0.75rem;
+    --font-size-base: 1rem;
+    --font-size-large: 1.1rem;
+    --font-size-h3: 1.3rem;
+    --font-size-h2: 2rem;
+    --font-size-h1: 3rem;
+    --font-size-h1-mobile: 2rem;
+
+    /* Espaçamentos */
+    --spacing-xs: 4px;
+    --spacing-sm: 10px;
+    --spacing-md: 20px;
+    --spacing-lg: 40px;
+    --spacing-xl: 80px;
+
+    /* Bordas e Raios */
+    --border-radius-sm: 6px;
+    --border-radius-md: 12px;
+    --border-radius-lg: 20px;
+
+    /* Transições */
+    --transition-fast: 0.1s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.5s ease;
+
+    /* Sombras */
+    --shadow-glow-sm: 0 0 10px;
+    --shadow-glow-md: 0 0 20px;
+    --shadow-glow-lg: 0 0 30px;
+
+    /* Z-index */
+    --z-canvas: 1;
+    --z-content: 2;
+    --z-overlay: 49;
+    --z-card: 50;
+    --z-hud: 100;
+    --z-loading: 10000;
+}

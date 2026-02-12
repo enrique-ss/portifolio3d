@@ -1,0 +1,360 @@
+/* ========================================
+   SCRIPT PARA INDEX.HTML
+======================================== */
+
+import { createStarField } from './shared-functions.js';
+import { INDEX_MODULES } from './config.js';
+
+/* ========================================
+   CONFIGURAÇÃO DA CENA THREE.JS
+======================================== */
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.z = 15;
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+document.body.appendChild(renderer.domElement);
+
+/* ========================================
+   ILUMINAÇÃO DA CENA
+======================================== */
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+scene.add(ambientLight);
+
+const pointLight = new THREE.PointLight(0xe2d1b1, 1, 100);
+pointLight.position.set(5, 5, 5);
+scene.add(pointLight);
+
+/* ========================================
+   CRIAÇÃO DO CAMPO DE ESTRELAS
+======================================== */
+const stars = createStarField(18000, 'rgba(226, 209, 177, 0.4)');
+scene.add(stars);
+
+/* ========================================
+   CRIAÇÃO DOS MÓDULOS 3D
+======================================== */
+const moduleObjects = [];
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+let hoveredModule = null;
+
+INDEX_MODULES.forEach((module, index) => {
+    // Geometria principal do módulo
+    const geometry = new THREE.IcosahedronGeometry(0.8, 2);
+    const material = new THREE.MeshBasicMaterial({
+        color: module.color,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.5
+    });
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(module.position.x, module.position.y, module.position.z);
+    mesh.userData = { moduleIndex: index, module: module };
+    scene.add(mesh);
+
+    // Efeito de brilho
+    const glowGeometry = new THREE.IcosahedronGeometry(0.9, 2);
+    const glowMaterial = new THREE.MeshBasicMaterial({
+        color: module.color,
+        transparent: true,
+        opacity: 0.1,
+        side: THREE.BackSide
+    });
+    const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+    mesh.add(glow);
+
+    // Anel de partículas
+    const ringGeometry = new THREE.BufferGeometry();
+    const ringPositions = [];
+    for (let i = 0; i < 500; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const radius = 1.3 + Math.random() * 0.3;
+        ringPositions.push(
+            Math.cos(angle) * radius,
+            (Math.random() - 0.5) * 0.1,
+            Math.sin(angle) * radius
+        );
+    }
+    ringGeometry.setAttribute('position', new THREE.Float32BufferAttribute(ringPositions, 3));
+    const ringMaterial = new THREE.PointsMaterial({
+        color: module.color,
+        size: 0.05,
+        transparent: true,
+        opacity: 0.4,
+        blending: THREE.AdditiveBlending
+    });
+    const ring = new THREE.Points(ringGeometry, ringMaterial);
+    scene.add(ring);
+    ring.position.copy(mesh.position);
+
+    moduleObjects.push({ mesh, glow, ring, module });
+});
+
+/* ========================================
+   VARIÁVEIS DE ESTADO
+======================================== */
+let spaceship = null;
+let isExperienceStarted = false;
+let isDragging = false;
+let previousMousePosition = { x: 0, y: 0 };
+let rotation = { x: 0, y: 0 };
+
+const profileCard = document.getElementById('profile-card');
+
+/* ========================================
+   FUNÇÕES DE CONTROLE
+======================================== */
+function startExploration() {
+    isExperienceStarted = true;
+    document.getElementById('profile-card-container').classList.add('hidden');
+    document.getElementById('profile-overlay').classList.add('hidden');
+    document.getElementById('hud').classList.add('visible');
+    document.getElementById('nav-hint').classList.add('visible');
+}
+
+function returnToCard() {
+    isExperienceStarted = false;
+    document.getElementById('profile-card-container').classList.remove('hidden');
+    document.getElementById('profile-overlay').classList.remove('hidden');
+    document.getElementById('hud').classList.remove('visible');
+    document.getElementById('nav-hint').classList.remove('visible');
+    document.getElementById('info-panel').classList.remove('visible');
+}
+
+document.getElementById('explore-btn').addEventListener('click', startExploration);
+document.getElementById('explore-btn-back').addEventListener('click', startExploration);
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && isExperienceStarted) {
+        returnToCard();
+    }
+});
+
+/* ========================================
+   CONTROLES DE MOUSE
+======================================== */
+document.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    previousMousePosition = { x: e.clientX, y: e.clientY };
+});
+
+document.addEventListener('mousemove', (e) => {
+    mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+    if (isDragging) {
+        const deltaMove = {
+            x: e.clientX - previousMousePosition.x,
+            y: e.clientY - previousMousePosition.y
+        };
+        rotation.y += deltaMove.x * 0.005;
+        rotation.x += deltaMove.y * 0.005;
+        previousMousePosition = { x: e.clientX, y: e.clientY };
+    }
+});
+
+document.addEventListener('mouseup', () => {
+    isDragging = false;
+});
+
+document.addEventListener('wheel', (e) => {
+    if (!isExperienceStarted) return;
+    e.preventDefault();
+    camera.position.z += e.deltaY * 0.01;
+    camera.position.z = Math.max(8, Math.min(30, camera.position.z));
+}, { passive: false });
+
+/* ========================================
+   NAVEGAÇÃO
+======================================== */
+document.addEventListener('click', (e) => {
+    if (isDragging || !isExperienceStarted) return;
+
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(moduleObjects.map(m => m.mesh));
+
+    if (intersects.length > 0) {
+        const targetModule = intersects[0].object;
+        const module = targetModule.userData.module;
+        if (module.url) {
+            navigateToModule(targetModule, module.url);
+        }
+    }
+});
+
+function navigateToModule(targetMesh, url) {
+    isExperienceStarted = false;
+    document.getElementById('info-panel').classList.remove('visible');
+
+    const shipGeometry = new THREE.ConeGeometry(0.1, 0.3, 4);
+    const shipMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true });
+    spaceship = new THREE.Mesh(shipGeometry, shipMaterial);
+
+    const startPos = new THREE.Vector3(
+        (Math.random() - 0.5) * 40,
+        (Math.random() - 0.5) * 40,
+        -30
+    );
+    spaceship.position.copy(startPos);
+    scene.add(spaceship);
+
+    const trailGeometry = new THREE.BufferGeometry();
+    const trailPositions = [];
+    for (let i = 0; i < 20; i++) {
+        trailPositions.push(0, 0, 0);
+    }
+    trailGeometry.setAttribute('position', new THREE.Float32BufferAttribute(trailPositions, 3));
+
+    const trailMaterial = new THREE.PointsMaterial({
+        color: 0xffffff,
+        size: 0.1,
+        transparent: true,
+        opacity: 0.6
+    });
+    const trail = new THREE.Points(trailGeometry, trailMaterial);
+    scene.add(trail);
+
+    const targetPos = targetMesh.position.clone();
+    gsap.to(spaceship.position, {
+        x: targetPos.x,
+        y: targetPos.y,
+        z: targetPos.z,
+        duration: 3,
+        ease: 'power2.inOut',
+        onUpdate: function () {
+            spaceship.lookAt(targetPos);
+            spaceship.rotation.x += Math.PI / 2;
+
+            const positions = trail.geometry.attributes.position.array;
+            for (let i = positions.length - 3; i >= 3; i -= 3) {
+                positions[i] = positions[i - 3];
+                positions[i + 1] = positions[i - 2];
+                positions[i + 2] = positions[i - 1];
+            }
+            positions[0] = spaceship.position.x;
+            positions[1] = spaceship.position.y;
+            positions[2] = spaceship.position.z;
+            trail.geometry.attributes.position.needsUpdate = true;
+        },
+        onComplete: function () {
+            gsap.to(targetMesh.material, {
+                opacity: 1,
+                duration: 0.2,
+                yoyo: true,
+                repeat: 3
+            });
+
+            setTimeout(() => {
+                gsap.to(document.body, {
+                    opacity: 0,
+                    duration: 0.5,
+                    onComplete: () => {
+                        window.location.href = url;
+                    }
+                });
+            }, 500);
+        }
+    });
+
+    gsap.to(spaceship.scale, {
+        x: 1.3,
+        y: 1.3,
+        z: 1.3,
+        duration: 0.3,
+        yoyo: true,
+        repeat: -1
+    });
+}
+
+/* ========================================
+   HOVER
+======================================== */
+function updateHover() {
+    if (!isExperienceStarted) return;
+
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(moduleObjects.map(m => m.mesh));
+
+    if (intersects.length > 0) {
+        const moduleIndex = intersects[0].object.userData.moduleIndex;
+
+        if (hoveredModule !== moduleIndex) {
+            hoveredModule = moduleIndex;
+            const module = INDEX_MODULES[moduleIndex];
+
+            document.getElementById('info-title').textContent = module.name;
+            document.getElementById('info-filename').textContent = module.filename;
+            document.getElementById('info-description').textContent = module.description;
+            document.getElementById('info-panel').classList.add('visible');
+            document.body.style.cursor = 'pointer';
+        }
+    } else {
+        if (hoveredModule !== null) {
+            hoveredModule = null;
+            document.getElementById('info-panel').classList.remove('visible');
+            document.body.style.cursor = 'crosshair';
+        }
+    }
+}
+
+/* ========================================
+   LOOP DE ANIMAÇÃO
+======================================== */
+function animate() {
+    if (!isExperienceStarted) {
+        profileCard.style.transform = `rotateY(${rotation.y * 100}deg) rotateX(${-rotation.x * 100}deg)`;
+    }
+
+    scene.rotation.y = rotation.y;
+    scene.rotation.x = rotation.x;
+
+    const time = Date.now() * 0.0001;
+    moduleObjects.forEach((obj, i) => {
+        obj.mesh.rotation.y += 0.0015;
+        obj.mesh.rotation.x += 0.0005;
+        obj.ring.rotation.y += 0.002;
+
+        const orbitSpeed = 0.1 + i * 0.05;
+        const orbitRadius = 0.3;
+        const driftX = Math.sin(time * orbitSpeed + i) * orbitRadius * 0.01;
+        const driftY = Math.cos(time * orbitSpeed * 0.7 + i) * orbitRadius * 0.01;
+        const driftZ = Math.sin(time * orbitSpeed * 0.5 + i) * orbitRadius * 0.01;
+
+        obj.mesh.position.x += driftX;
+        obj.mesh.position.y += driftY;
+        obj.mesh.position.z += driftZ;
+        obj.ring.position.copy(obj.mesh.position);
+
+        const pulse = Math.sin(Date.now() * 0.001 + i) * 0.1 + 1;
+        obj.glow.scale.set(pulse, pulse, pulse);
+    });
+
+    stars.rotation.y += 0.0002;
+    document.getElementById('cam-distance').textContent = camera.position.z.toFixed(1);
+
+    updateHover();
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+}
+
+/* ========================================
+   RESPONSIVIDADE
+======================================== */
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+/* ========================================
+   INICIALIZAÇÃO
+======================================== */
+document.body.style.opacity = '0';
+window.addEventListener('load', () => {
+    gsap.to(document.body, { opacity: 1, duration: 1 });
+});
+
+animate();

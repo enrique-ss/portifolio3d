@@ -5,302 +5,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Projetos — Enrique Silveira</title>
+
+    <!-- Fontes -->
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,700&family=Inter:wght@300;400&family=JetBrains+Mono:wght@300;400&display=swap"
         rel="stylesheet">
-    <style>
-        :root {
-            --bg-color: #050505;
-            --accent-color: #fbbf24;
-            --text-color: #f5f5f5;
-        }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
-            cursor: crosshair;
-        }
-
-        #hud {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 100;
-            pointer-events: none;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
-            color: var(--accent-color);
-            opacity: 0.6;
-            padding: 20px;
-        }
-
-        .hud-top {
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .hud-line {
-            margin-bottom: 4px;
-            letter-spacing: 1px;
-        }
-
-        .blink {
-            animation: blink 1s infinite;
-        }
-
-        @keyframes blink {
-
-            0%,
-            49% {
-                opacity: 1;
-            }
-
-            50%,
-            100% {
-                opacity: 0;
-            }
-        }
-
-        canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 1;
-        }
-
-        #scroll-wrapper {
-            position: relative;
-            z-index: 2;
-            min-height: 1000vh;
-        }
-
-        section {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            padding: 0 10%;
-        }
-
-        .poetic-content {
-            max-width: 650px;
-            opacity: 0;
-            background: rgba(5, 5, 5, 0.85);
-            backdrop-filter: blur(15px);
-            padding: 40px;
-            border-radius: 12px;
-            border: 1px solid rgba(251, 191, 36, 0.2);
-            transition: border-color 0.3s ease, transform 0.1s ease;
-            transform-style: preserve-3d;
-            will-change: transform;
-        }
-
-        .poetic-content:hover {
-            border-color: rgba(251, 191, 36, 0.5);
-        }
-
-        .poetic-content h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: 2.8rem;
-            color: var(--accent-color);
-            margin: 0 0 0.5rem 0;
-            line-height: 1.2;
-        }
-
-        .poetic-content .meta {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            color: var(--accent-color);
-            opacity: 0.7;
-            margin-bottom: 1rem;
-            letter-spacing: 1px;
-        }
-
-        .poetic-content p {
-            font-size: 1rem;
-            line-height: 1.8;
-            opacity: 0.9;
-            margin-bottom: 1.5rem;
-        }
-
-        .tech-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .tech-tag {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem;
-            padding: 0.4rem 0.8rem;
-            background: rgba(251, 191, 36, 0.1);
-            border: 1px solid rgba(251, 191, 36, 0.3);
-            border-radius: 6px;
-            color: var(--accent-color);
-        }
-
-        .project-links {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .project-link {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-            padding: 0.7rem 1.5rem;
-            background: transparent;
-            border: 1px solid var(--accent-color);
-            color: var(--accent-color);
-            text-decoration: none;
-            border-radius: 6px;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            display: inline-block;
-        }
-
-        .project-link:hover {
-            background: var(--accent-color);
-            color: var(--bg-color);
-            box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
-        }
-
-        .project-link.primary {
-            background: var(--accent-color);
-            color: var(--bg-color);
-        }
-
-        .project-link.primary:hover {
-            background: transparent;
-            color: var(--accent-color);
-        }
-
-        .return-button {
-            margin-top: 2rem;
-            padding: 12px 30px;
-            background: transparent;
-            border: 1px solid var(--accent-color);
-            color: var(--accent-color);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .return-button:hover {
-            background: var(--accent-color);
-            color: var(--bg-color);
-            box-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
-        }
-
-        #loading {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--bg-color);
-            z-index: 10000;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            font-family: 'JetBrains Mono', monospace;
-            transition: opacity 0.5s ease;
-        }
-
-        #loading.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .loader-text {
-            color: var(--accent-color);
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
-
-        .loader-bar {
-            width: 300px;
-            height: 2px;
-            background: rgba(251, 191, 36, 0.2);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .loader-progress {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            background: var(--accent-color);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        .status-badge {
-            display: inline-block;
-            font-size: 0.7rem;
-            padding: 0.3rem 0.7rem;
-            border-radius: 4px;
-            font-weight: 600;
-            text-transform: uppercase;
-            margin-bottom: 1rem;
-        }
-
-        .status-badge.complete {
-            background: rgba(34, 197, 94, 0.2);
-            color: rgb(34, 197, 94);
-            border: 1px solid rgb(34, 197, 94);
-        }
-
-        .status-badge.progress {
-            background: rgba(59, 130, 246, 0.2);
-            color: rgb(59, 130, 246);
-            border: 1px solid rgb(59, 130, 246);
-        }
-
-        .status-badge.moderate {
-            background: rgba(234, 179, 8, 0.2);
-            color: rgb(234, 179, 8);
-            border: 1px solid rgb(234, 179, 8);
-        }
-
-        .status-badge.early {
-            background: rgba(239, 68, 68, 0.2);
-            color: rgb(239, 68, 68);
-            border: 1px solid rgb(239, 68, 68);
-        }
-
-        @media (max-width: 768px) {
-            .poetic-content {
-                padding: 30px;
-            }
-
-            .poetic-content h1 {
-                font-size: 2rem;
-            }
-
-            section {
-                padding: 0 5%;
-            }
-        }
-    </style>
+    <!-- CSS Modular -->
+    <link rel="stylesheet" href="styles/variables.css">
+    <link rel="stylesheet" href="styles/global.css">
+    <link rel="stylesheet" href="styles/content-pages.css">
 </head>
 
-<body>
+<body class="page-projetos">
     <!-- Loading Screen -->
     <div id="loading">
         <div class="loader-text">CARREGANDO PROJETOS<span class="blink">_</span></div>
@@ -309,7 +26,7 @@
         </div>
     </div>
 
-    <!-- HUD Overlay -->
+    <!-- HUD -->
     <div id="hud">
         <div class="hud-top">
             <div>
@@ -325,7 +42,8 @@
         </div>
     </div>
 
-    <main id="scroll-wrapper">
+    <!-- Conteúdo -->
+    <main id="scroll-wrapper" style="min-height: 1000vh;">
         <!-- Intro Section -->
         <section style="justify-content: center;">
             <div class="poetic-content" style="text-align: center;">
@@ -481,12 +199,10 @@
                     <span class="tech-tag">HTML/CSS</span>
                 </div>
                 <div class="project-links">
-                    <a href="https://github.com/enrique-ss/portifolio" target="_blank"
-                        class="project-link">GitHub ↗</a>
-                    <a href="https://enrique-ss.github.io/portifolio/" target="_blank"
-                        class="project-link primary">Ver Site ↗</a>
+                    <a href="https://github.com/enrique-ss/portifolio" target="_blank" class="project-link">GitHub ↗</a>
+                    <a href="https://enrique-ss.github.io/portifolio/" target="_blank" class="project-link primary">Ver
+                        Site ↗</a>
                 </div>
-
             </div>
         </section>
 
@@ -519,7 +235,8 @@
                 <span class="status-badge complete">Completo</span>
                 <p class="meta">PORTFÓLIO PROFISSIONAL • APRESENTAÇÃO</p>
                 <p>Portfólio pessoal desenvolvido com HTML, CSS e JavaScript para apresentar minhas habilidades,
-                    experiências e projetos como desenvolvedor Full-Stack e futuro Professor. Utilizadas as bibliotecas "three.js" e "gsap" para um designe 3d interativo.</p>
+                    experiências e projetos como desenvolvedor Full-Stack e futuro Professor. Utilizadas as bibliotecas
+                    "three.js" e "gsap" para um designe 3d interativo.</p>
                 <div class="tech-tags">
                     <span class="tech-tag">HTML/CSS</span>
                     <span class="tech-tag">JavaScript</span>
@@ -537,7 +254,8 @@
                 <h1>Templates para Projetos</h1>
                 <span class="status-badge complete">Completo</span>
                 <p class="meta">PRATICIDADE • AUTOMAÇÃO</p>
-                <p>Templates para projetos desenvolvidos com HTML, CSS, JS, TS e MySQL para facilitar a criação de novos projetos.</p>
+                <p>Templates para projetos desenvolvidos com HTML, CSS, JS, TS e MySQL para facilitar a criação de novos
+                    projetos.</p>
                 <div class="tech-tags">
                     <span class="tech-tag">CMD</span>
                 </div>
@@ -563,200 +281,13 @@
         </section>
     </main>
 
+    <!-- Bibliotecas Externas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
-    <script>
-        // ===== LOADING SCREEN =====
-        let loadProgress = 0;
-        const loadingEl = document.getElementById('loading');
-        const progressBar = document.querySelector('.loader-progress');
-
-        function updateProgress(progress) {
-            loadProgress = progress;
-            progressBar.style.width = progress + '%';
-            if (progress >= 100) {
-                setTimeout(() => {
-                    loadingEl.classList.add('hidden');
-                }, 500);
-            }
-        }
-
-        let simLoad = 0;
-        const loadInterval = setInterval(() => {
-            simLoad += Math.random() * 15;
-            if (simLoad >= 100) {
-                simLoad = 100;
-                clearInterval(loadInterval);
-            }
-            updateProgress(simLoad);
-        }, 100);
-
-        gsap.registerPlugin(ScrollTrigger);
-
-        // ===== MOUSE TRACKING =====
-        let mouseX = 0, mouseY = 0, targetMouseX = 0, targetMouseY = 0;
-        let cardMouseX = 0, cardMouseY = 0;
-
-        document.addEventListener('mousemove', (e) => {
-            targetMouseX = (e.clientX / window.innerWidth) * 2 - 1;
-            targetMouseY = -(e.clientY / window.innerHeight) * 2 + 1;
-
-            cardMouseX = e.clientX;
-            cardMouseY = e.clientY;
-        });
-
-        // ===== THREE.JS SETUP =====
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.01, 3000);
-        camera.position.z = 0.1;
-
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        document.body.appendChild(renderer.domElement);
-
-        function createStarTexture() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 128;
-            canvas.height = 128;
-            const ctx = canvas.getContext('2d');
-            const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 60);
-            grad.addColorStop(0, 'white');
-            grad.addColorStop(0.2, 'white');
-            grad.addColorStop(0.5, 'rgba(251,191,36,0.4)');
-            grad.addColorStop(1, 'rgba(0,0,0,0)');
-            ctx.fillStyle = grad;
-            ctx.beginPath();
-            ctx.arc(64, 64, 60, 0, Math.PI * 2);
-            ctx.fill();
-            return new THREE.CanvasTexture(canvas);
-        }
-
-        const starsGeom = new THREE.BufferGeometry();
-        const starsPos = [], starsSizes = [];
-        for (let i = 0; i < 18000; i++) {
-            starsPos.push((Math.random() - 0.5) * 1200, (Math.random() - 0.5) * 1200, (Math.random() - 0.5) * 2500);
-            starsSizes.push(Math.random() * 3 + 1);
-        }
-        starsGeom.setAttribute('position', new THREE.Float32BufferAttribute(starsPos, 3));
-        starsGeom.setAttribute('size', new THREE.Float32BufferAttribute(starsSizes, 1));
-
-        const starsMat = new THREE.PointsMaterial({
-            size: 4.0,
-            map: createStarTexture(),
-            transparent: true,
-            blending: THREE.AdditiveBlending,
-            depthWrite: false,
-            opacity: 0.8,
-            sizeAttenuation: true
-        });
-        const starField = new THREE.Points(starsGeom, starsMat);
-        scene.add(starField);
-
-        const coreGeom = new THREE.IcosahedronGeometry(1.5, 2);
-        const coreMat = new THREE.MeshBasicMaterial({
-            color: 0xfbbf24,
-            wireframe: true,
-            transparent: true,
-            opacity: 0.5
-        });
-        const core = new THREE.Mesh(coreGeom, coreMat);
-        scene.add(core);
-
-        // ===== SCROLL ANIMATION =====
-        const tl = gsap.timeline({
-            scrollTrigger: {
-                trigger: "#scroll-wrapper",
-                start: "top top",
-                end: "bottom bottom",
-                scrub: 2.5,
-                onUpdate: (self) => {
-                    document.getElementById('entropy').textContent = (self.progress * 100).toFixed(1);
-                }
-            }
-        });
-
-        tl.to(camera.position, { z: 150, ease: "power1.inOut" }, 0)
-            .to(core.rotation, { y: Math.PI * 1.5, ease: "none" }, 0)
-            .to(core.scale, { x: 0.008, y: 0.008, z: 0.008, ease: "power4.in" }, 0)
-            .to(coreMat, { opacity: 0.8, ease: "power2.in" }, 0);
-
-        // ===== CARD ANIMATIONS =====
-        gsap.utils.toArray(".poetic-content").forEach((card) => {
-            // Fade in on scroll
-            gsap.to(card, {
-                opacity: 1,
-                scrollTrigger: {
-                    trigger: card,
-                    start: "top 85%",
-                    end: "top 20%",
-                    scrub: true
-                }
-            });
-
-            // 3D tilt effect on hover
-            card.addEventListener('mousemove', (e) => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-
-                const rotateX = ((y - centerY) / centerY) * 10; // max 10deg
-                const rotateY = ((centerX - x) / centerX) * 10; // max 10deg
-
-                gsap.to(card, {
-                    duration: 0.3,
-                    rotateX: rotateX,
-                    rotateY: rotateY,
-                    transformPerspective: 1000,
-                    ease: "power2.out"
-                });
-            });
-
-            card.addEventListener('mouseleave', () => {
-                gsap.to(card, {
-                    duration: 0.5,
-                    rotateX: 0,
-                    rotateY: 0,
-                    ease: "power2.out"
-                });
-            });
-        });
-
-        // ===== ANIMATION LOOP =====
-        function animate() {
-            mouseX += (targetMouseX - mouseX) * 0.05;
-            mouseY += (targetMouseY - mouseY) * 0.05;
-
-            starField.rotation.x = mouseY * 0.05;
-            starField.rotation.y = mouseX * 0.05;
-
-            core.rotation.y += 0.0015;
-            core.rotation.x += 0.0005;
-            core.rotation.y += mouseX * 0.001;
-            core.rotation.x += mouseY * 0.001;
-
-            starField.rotation.y += 0.0002;
-
-            document.getElementById('coord-x').textContent = mouseX.toFixed(3);
-            document.getElementById('coord-y').textContent = mouseY.toFixed(3);
-            document.getElementById('coord-z').textContent = camera.position.z.toFixed(3);
-
-            renderer.render(scene, camera);
-            requestAnimationFrame(animate);
-        }
-        animate();
-
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-    </script>
+    <!-- Script Modular -->
+    <script type="module" src="scripts/projetos.js"></script>
 </body>
 
 </html>

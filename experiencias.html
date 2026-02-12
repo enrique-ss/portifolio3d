@@ -5,207 +5,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Experiências — Enrique Silveira</title>
+
+    <!-- Fontes -->
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,700&family=Inter:wght@300;400&family=JetBrains+Mono:wght@300;400&display=swap"
         rel="stylesheet">
-    <style>
-        :root {
-            --bg-color: #050505;
-            --accent-color: #ff6b9d;
-            --text-color: #f5f5f5;
-        }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
-            cursor: crosshair;
-        }
-
-        #hud {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 100;
-            pointer-events: none;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
-            color: var(--accent-color);
-            opacity: 0.6;
-            padding: 20px;
-        }
-
-        .hud-top {
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .hud-line {
-            margin-bottom: 4px;
-            letter-spacing: 1px;
-        }
-
-        .blink {
-            animation: blink 1s infinite;
-        }
-
-        @keyframes blink {
-
-            0%,
-            49% {
-                opacity: 1;
-            }
-
-            50%,
-            100% {
-                opacity: 0;
-            }
-        }
-
-        canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 1;
-        }
-
-        #scroll-wrapper {
-            position: relative;
-            z-index: 2;
-            min-height: 200vh;
-        }
-
-        section {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 10%;
-        }
-
-        .content-card {
-            max-width: 700px;
-            opacity: 0;
-            background: rgba(5, 5, 5, 0.85);
-            backdrop-filter: blur(15px);
-            padding: 40px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 107, 157, 0.2);
-            text-align: center;
-            transition: border-color 0.3s ease, transform 0.1s ease;
-            transform-style: preserve-3d;
-            will-change: transform;
-        }
-
-        .content-card:hover {
-            border-color: rgba(255, 107, 157, 0.5);
-        }
-
-        .content-card h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: 3rem;
-            color: var(--accent-color);
-            margin: 0 0 1rem 0;
-        }
-
-        .content-card p {
-            font-size: 1.1rem;
-            line-height: 1.8;
-            opacity: 0.9;
-            margin-bottom: 2rem;
-        }
-
-        .return-button {
-            margin-top: 2rem;
-            padding: 12px 30px;
-            background: transparent;
-            border: 1px solid var(--accent-color);
-            color: var(--accent-color);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            opacity: 0;
-        }
-
-        .return-button:hover {
-            background: var(--accent-color);
-            color: var(--bg-color);
-            box-shadow: 0 0 20px rgba(255, 107, 157, 0.5);
-        }
-
-        #loading {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--bg-color);
-            z-index: 10000;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            font-family: 'JetBrains Mono', monospace;
-            transition: opacity 0.5s ease;
-        }
-
-        #loading.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .loader-text {
-            color: var(--accent-color);
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
-
-        .loader-bar {
-            width: 300px;
-            height: 2px;
-            background: rgba(255, 107, 157, 0.2);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .loader-progress {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            background: var(--accent-color);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        @media (max-width: 768px) {
-            .content-card {
-                padding: 30px;
-            }
-
-            .content-card h1 {
-                font-size: 2rem;
-            }
-
-            section {
-                padding: 0 5%;
-            }
-        }
-    </style>
+    <!-- CSS Modular -->
+    <link rel="stylesheet" href="styles/variables.css">
+    <link rel="stylesheet" href="styles/global.css">
+    <link rel="stylesheet" href="styles/content-pages.css">
 </head>
 
-<body>
+<body class="page-experiencias">
     <!-- Loading Screen -->
     <div id="loading">
         <div class="loader-text">CARREGANDO EXPERIÊNCIAS<span class="blink">_</span></div>
@@ -214,6 +26,7 @@
         </div>
     </div>
 
+    <!-- HUD -->
     <div id="hud">
         <div class="hud-top">
             <div>
@@ -229,7 +42,8 @@
         </div>
     </div>
 
-    <main id="scroll-wrapper">
+    <!-- Conteúdo -->
+    <main id="scroll-wrapper" style="min-height: 200vh;">
         <section>
             <div class="content-card">
                 <h1>Experiências Profissionais</h1>
@@ -240,242 +54,13 @@
         </section>
     </main>
 
+    <!-- Bibliotecas Externas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <script>
-        // ===== LOADING SCREEN =====
-        let loadProgress = 0;
-        const loadingEl = document.getElementById('loading');
-        const progressBar = document.querySelector('.loader-progress');
 
-        function updateProgress(progress) {
-            loadProgress = progress;
-            progressBar.style.width = progress + '%';
-            if (progress >= 100) {
-                setTimeout(() => {
-                    loadingEl.classList.add('hidden');
-                }, 500);
-            }
-        }
-
-        let simLoad = 0;
-        const loadInterval = setInterval(() => {
-            simLoad += Math.random() * 15;
-            if (simLoad >= 100) {
-                simLoad = 100;
-                clearInterval(loadInterval);
-            }
-            updateProgress(simLoad);
-        }, 100);
-
-        gsap.registerPlugin(ScrollTrigger);
-
-        // ===== MOUSE TRACKING =====
-        let mouseX = 0, mouseY = 0, targetMouseX = 0, targetMouseY = 0;
-
-        document.addEventListener('mousemove', (e) => {
-            targetMouseX = (e.clientX / window.innerWidth) * 2 - 1;
-            targetMouseY = -(e.clientY / window.innerHeight) * 2 + 1;
-        });
-
-        // ===== THREE.JS SETUP =====
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.01, 3000);
-        camera.position.z = 0.1;
-
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        document.body.appendChild(renderer.domElement);
-
-        function createStarTexture() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 128;
-            canvas.height = 128;
-            const ctx = canvas.getContext('2d');
-            const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 60);
-            grad.addColorStop(0, 'white');
-            grad.addColorStop(0.2, 'white');
-            grad.addColorStop(0.5, 'rgba(255,107,157,0.4)');
-            grad.addColorStop(1, 'rgba(0,0,0,0)');
-            ctx.fillStyle = grad;
-            ctx.beginPath();
-            ctx.arc(64, 64, 60, 0, Math.PI * 2);
-            ctx.fill();
-            return new THREE.CanvasTexture(canvas);
-        }
-
-        const starsGeom = new THREE.BufferGeometry();
-        const starsPos = [], starsSizes = [];
-        for (let i = 0; i < 18000; i++) {
-            starsPos.push((Math.random() - 0.5) * 1200, (Math.random() - 0.5) * 1200, (Math.random() - 0.5) * 2500);
-            starsSizes.push(Math.random() * 3 + 1);
-        }
-        starsGeom.setAttribute('position', new THREE.Float32BufferAttribute(starsPos, 3));
-        starsGeom.setAttribute('size', new THREE.Float32BufferAttribute(starsSizes, 1));
-
-        const starsMat = new THREE.PointsMaterial({
-            size: 4.0,
-            map: createStarTexture(),
-            transparent: true,
-            blending: THREE.AdditiveBlending,
-            depthWrite: false,
-            opacity: 0.8,
-            sizeAttenuation: true
-        });
-        const starField = new THREE.Points(starsGeom, starsMat);
-        scene.add(starField);
-
-        // Dodecahedron core instead of icosahedron
-        const coreGeom = new THREE.DodecahedronGeometry(1.5, 0);
-        const coreMat = new THREE.MeshBasicMaterial({
-            color: 0xff6b9d,
-            wireframe: true,
-            transparent: true,
-            opacity: 0.5
-        });
-        const core = new THREE.Mesh(coreGeom, coreMat);
-        scene.add(core);
-
-        // Add pulsing particles around core
-        const particlesGeom = new THREE.BufferGeometry();
-        const particlesPos = [];
-        for (let i = 0; i < 200; i++) {
-            const theta = Math.random() * Math.PI * 2;
-            const phi = Math.random() * Math.PI;
-            const radius = 2 + Math.random() * 0.5;
-            particlesPos.push(
-                radius * Math.sin(phi) * Math.cos(theta),
-                radius * Math.sin(phi) * Math.sin(theta),
-                radius * Math.cos(phi)
-            );
-        }
-        particlesGeom.setAttribute('position', new THREE.Float32BufferAttribute(particlesPos, 3));
-        const particlesMat = new THREE.PointsMaterial({
-            color: 0xff6b9d,
-            size: 0.08,
-            transparent: true,
-            opacity: 0.6,
-            blending: THREE.AdditiveBlending
-        });
-        const particles = new THREE.Points(particlesGeom, particlesMat);
-        scene.add(particles);
-
-        // ===== SCROLL ANIMATION =====
-        const tl = gsap.timeline({
-            scrollTrigger: {
-                trigger: "#scroll-wrapper",
-                start: "top top",
-                end: "bottom bottom",
-                scrub: 2.5,
-                onUpdate: (self) => {
-                    document.getElementById('entropy').textContent = (self.progress * 100).toFixed(1);
-                }
-            }
-        });
-
-        tl.to(camera.position, { z: 150, ease: "power1.inOut" }, 0)
-            .to(core.rotation, { y: Math.PI * 1.5, x: Math.PI * 0.5, ease: "none" }, 0)
-            .to(particles.rotation, { y: -Math.PI * 2, ease: "none" }, 0)
-            .to(core.scale, { x: 0.008, y: 0.008, z: 0.008, ease: "power4.in" }, 0)
-            .to(coreMat, { opacity: 0.8, ease: "power2.in" }, 0);
-
-        // ===== CARD ANIMATIONS =====
-        gsap.utils.toArray(".content-card").forEach((card) => {
-            const button = card.querySelector('.return-button');
-
-            // Fade in on scroll
-            gsap.to(card, {
-                opacity: 1,
-                scrollTrigger: {
-                    trigger: card,
-                    start: "top 85%",
-                    end: "top 20%",
-                    scrub: true
-                }
-            });
-
-            if (button) {
-                gsap.to(button, {
-                    opacity: 1,
-                    scrollTrigger: {
-                        trigger: card,
-                        start: "top 50%",
-                        end: "top 20%",
-                        scrub: 1.5
-                    }
-                });
-            }
-
-            // 3D tilt effect on hover
-            card.addEventListener('mousemove', (e) => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-
-                const rotateX = ((y - centerY) / centerY) * 10;
-                const rotateY = ((centerX - x) / centerX) * 10;
-
-                gsap.to(card, {
-                    duration: 0.3,
-                    rotateX: rotateX,
-                    rotateY: rotateY,
-                    transformPerspective: 1000,
-                    ease: "power2.out"
-                });
-            });
-
-            card.addEventListener('mouseleave', () => {
-                gsap.to(card, {
-                    duration: 0.5,
-                    rotateX: 0,
-                    rotateY: 0,
-                    ease: "power2.out"
-                });
-            });
-        });
-
-        // ===== ANIMATION LOOP =====
-        function animate() {
-            mouseX += (targetMouseX - mouseX) * 0.05;
-            mouseY += (targetMouseY - mouseY) * 0.05;
-
-            starField.rotation.x = mouseY * 0.05;
-            starField.rotation.y = mouseX * 0.05;
-
-            core.rotation.y += 0.0018;
-            core.rotation.x += 0.0012;
-            core.rotation.y += mouseX * 0.001;
-            core.rotation.x += mouseY * 0.001;
-
-            particles.rotation.y -= 0.0005;
-
-            starField.rotation.y += 0.0002;
-
-            // Pulsing particles
-            const time = Date.now() * 0.001;
-            const scale = 1 + Math.sin(time) * 0.1;
-            particles.scale.set(scale, scale, scale);
-
-            document.getElementById('coord-x').textContent = mouseX.toFixed(3);
-            document.getElementById('coord-y').textContent = mouseY.toFixed(3);
-            document.getElementById('coord-z').textContent = camera.position.z.toFixed(3);
-
-            renderer.render(scene, camera);
-            requestAnimationFrame(animate);
-        }
-        animate();
-
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-    </script>
+    <!-- Script Modular -->
+    <script type="module" src="scripts/experiencias.js"></script>
 </body>
 
 </html>

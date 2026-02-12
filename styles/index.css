@@ -1,61 +1,29 @@
 /* ========================================
-   ESTILOS GERAIS E VARIÁVEIS (BASE)
-======================================== */
-:root {
-    --z-overlay: 100;
-    --z-card: 200;
-    --z-hud: 300;
-    --transition-slow: 0.8s;
-    --transition-base: 0.3s;
-    --transition-fast: 0.1s;
-    --accent-rgb: 226, 209, 177;
-    --neutral: #e2d1b1;
-    --bg: #050505;
-    --radius-lg: 20px;
-    --radius-md: 12px;
-    --radius-sm: 8px;
-    --space-2: 8px;
-    --space-3: 16px;
-    --space-4: 24px;
-    --space-5: 32px;
-    --font-mono: 'JetBrains Mono', monospace;
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    background-color: var(--bg);
-    color: white;
-    font-family: 'Inter', sans-serif;
-    overflow: hidden;
-    height: 100vh;
-}
-
-/* ========================================
-   HUD E NAV-HINT (SINCRONIA TOTAL)
+   ESTILOS ESPECÍFICOS INDEX.HTML
 ======================================== */
 
+/* HUD & NAV-HINT (SINCRONIA TOTAL)
+   Utiliza as variáveis de variables.css para garantir que
+   a cor mude conforme a página (Experiências, Projetos, etc)
+======================================== */
 #hud,
 #nav-hint {
     position: fixed;
     z-index: var(--z-hud);
 
-    /* Tipografia e Cores */
+    /* Tipografia e Cores Baseadas no Sistema Global */
     font-family: var(--font-mono);
-    color: var(--neutral);
+    color: var(--accent);
+    /* Vinculado à cor dinâmica da página */
     font-size: 11px;
     letter-spacing: 2px;
     text-transform: uppercase;
     line-height: 1.5;
 
-    /* Efeito visual de profundidade */
+    /* Efeito visual para leitura sobre o canvas */
     text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 
-    /* Visibilidade (Igualando a Opacidade) */
+    /* Visibilidade e Comportamento */
     pointer-events: none;
     transition: opacity var(--transition-slow);
     opacity: 0;
@@ -74,7 +42,7 @@ body {
     text-align: right;
 }
 
-/* Estado Ativo (Ambos com 0.4 de opacidade) */
+/* Estado Ativo: Ambos rigorosamente com 0.4 de opacidade */
 #hud.visible,
 #nav-hint.visible {
     opacity: 0.4 !important;
@@ -88,7 +56,6 @@ body {
 /* ========================================
    OVERLAY E CARD DE PERFIL
 ======================================== */
-
 #profile-overlay {
     position: fixed;
     inset: 0;
@@ -134,7 +101,7 @@ body {
     backface-visibility: hidden;
     background: rgba(5, 5, 5, 0.95);
     backdrop-filter: blur(20px);
-    border: 2px solid rgba(226, 209, 177, 0.3);
+    border: 2px solid rgba(var(--accent-rgb), 0.3);
     border-radius: var(--radius-lg);
     padding: var(--space-4);
     text-align: center;
@@ -142,7 +109,7 @@ body {
 }
 
 .card-face:hover {
-    border-color: rgba(226, 209, 177, 0.6);
+    border-color: rgba(var(--accent-rgb), 0.6);
 }
 
 .card-front {
@@ -167,13 +134,19 @@ body {
 }
 
 .profile-card__name {
+    font-family: var(--font-display);
     font-size: 1.6rem;
+    color: var(--accent);
     margin-bottom: var(--space-2);
 }
 
 .profile-card__role {
+    font-family: var(--font-mono);
+    color: var(--accent);
+    opacity: 0.8;
     margin-bottom: var(--space-3);
     font-size: 0.85rem;
+    text-transform: uppercase;
 }
 
 .profile-card__bio {
@@ -218,23 +191,27 @@ body {
 
 /* Lado B (Secret) */
 .secret-title {
+    font-family: var(--font-display);
     color: #ff6b9d;
+    /* Rosa específico para o lado secreto */
     font-size: 1.6rem;
     margin-bottom: var(--space-2);
 }
 
 .secret-subtitle {
+    font-family: var(--font-mono);
     color: rgba(255, 107, 157, 0.7);
     margin-bottom: 20px;
     font-size: 0.75rem;
+    text-transform: uppercase;
 }
 
 /* Botão Explorar */
 .explore-button {
     padding: 12px 40px;
     background: transparent;
-    border: 2px solid var(--neutral);
-    color: var(--neutral);
+    border: 2px solid var(--accent);
+    color: var(--accent);
     font-family: var(--font-mono);
     font-size: 0.9rem;
     font-weight: 700;
@@ -245,6 +222,7 @@ body {
     border-radius: var(--radius-sm);
     position: relative;
     overflow: hidden;
+    z-index: 1;
 }
 
 .explore-button::before {
@@ -255,7 +233,7 @@ body {
     width: 0;
     height: 0;
     border-radius: 50%;
-    background: var(--neutral);
+    background: var(--accent);
     transition: width 0.8s ease, height 0.8s ease;
     transform: translate(-50%, -50%);
     z-index: -1;
@@ -268,11 +246,12 @@ body {
 
 .explore-button:hover {
     color: var(--bg);
-    border-color: var(--neutral);
-    box-shadow: 0 0 30px rgba(226, 209, 177, 0.5);
+    box-shadow: 0 0 30px rgba(var(--accent-rgb), 0.5);
 }
 
-/* Painel de Info */
+/* ========================================
+   PAINEL DE INFO (PLANETAS)
+======================================== */
 #info-panel {
     position: fixed;
     bottom: 40px;
@@ -295,20 +274,24 @@ body {
 }
 
 .info-title {
+    font-family: var(--font-display);
     font-size: 2rem;
-    color: var(--neutral);
+    color: var(--accent);
 }
 
 .info-filename {
     margin-bottom: 15px;
     font-family: var(--font-mono);
     font-size: 12px;
+    color: var(--accent);
     opacity: 0.7;
+    text-transform: uppercase;
 }
 
 .info-description {
     font-size: 13px;
     line-height: 1.6;
+    color: white;
     opacity: 0.9;
     margin-bottom: var(--space-3);
 }
@@ -316,12 +299,16 @@ body {
 .info-action {
     font-family: var(--font-mono);
     font-size: 11px;
+    color: var(--accent);
     opacity: 0.6;
     text-align: center;
     letter-spacing: 2px;
+    text-transform: uppercase;
 }
 
-/* Responsividade */
+/* ========================================
+   RESPONSIVIDADE
+======================================== */
 @media (max-width: 768px) {
     #profile-card-container {
         max-width: 360px;
@@ -334,5 +321,10 @@ body {
 
     #nav-hint {
         right: 20px;
+    }
+
+    #info-panel {
+        width: 90%;
+        padding: var(--space-3);
     }
 }

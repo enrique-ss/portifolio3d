@@ -42,7 +42,7 @@ export const CONFIG = {
             name: 'Formação',
             filename: 'education.db',
             description: 'Minha jornada acadêmica: Licenciatura em Computação, cursos complementares e certificações que moldaram meu conhecimento.',
-            url: 'formacao.html',
+            url: './html/formacao.html',
             position: { x: -8, y: 4, z: -3 },
             color: 0x4ecca3
         },
@@ -50,7 +50,7 @@ export const CONFIG = {
             name: 'Experiências',
             filename: 'experience.log',
             description: 'Projetos profissionais, trabalhos desenvolvidos e experiências que contribuíram para minha formação como desenvolvedor.',
-            url: 'experiencias.html',
+            url: './html/experiencias.html',
             position: { x: 7, y: -3, z: 5 },
             color: 0xff6b9d
         },
@@ -58,7 +58,7 @@ export const CONFIG = {
             name: 'Projetos',
             filename: 'projects.json',
             description: 'Portfólio completo de aplicações web, sistemas e experimentos criativos desenvolvidos ao longo da minha jornada.',
-            url: 'projetos.html',
+            url: './html/projetos.html',
             position: { x: -5, y: -5, z: 8 },
             color: 0xfbbf24
         }

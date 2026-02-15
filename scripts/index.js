@@ -1,8 +1,12 @@
 /* ========================================
-   SCRIPT PARA INDEX.HTML (CORRIGIDO)
+   SCRIPT PARA INDEX.HTML (APENAS MODELOS GLB)
+   VERSÃO LIMPA - SEM GEOMETRIAS PROCEDURAIS
 ======================================== */
 
 import { INDEX_MODULES } from './config.js';
+
+console.log('🚀 INICIANDO NOVO SISTEMA COM MODELOS GLB');
+console.log('📦 Módulos a carregar:', INDEX_MODULES);
 
 /* ========================================
    FUNÇÃO PARA CRIAR CAMPO DE ESTRELAS
@@ -66,76 +70,36 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 document.body.appendChild(renderer.domElement);
 
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
 scene.add(ambientLight);
 
-const pointLight = new THREE.PointLight(0xe2d1b1, 1, 100);
+const pointLight = new THREE.PointLight(0xe2d1b1, 2, 100);
 pointLight.position.set(5, 5, 5);
 scene.add(pointLight);
 
 const stars = createStarField(18000, 'rgba(226, 209, 177, 0.4)');
 scene.add(stars);
 
+console.log('✓ Cena configurada');
+
 /* ========================================
-   CRIAÇÃO DOS MÓDULOS 3D
+   MAPEAMENTO DE MODELOS GLB
+======================================== */
+const MODEL_PATHS = {
+    'Formação': './objects/earth.glb',
+    'Experiências': './objects/planet.glb',
+    'Projetos': './objects/zelda.glb'
+};
+
+console.log('📂 Caminhos dos modelos:', MODEL_PATHS);
+
+/* ========================================
+   VARIÁVEIS GLOBAIS
 ======================================== */
 const moduleObjects = [];
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 let hoveredModule = null;
-
-INDEX_MODULES.forEach((module, index) => {
-    const geometry = new THREE.IcosahedronGeometry(0.8, 2);
-    const material = new THREE.MeshBasicMaterial({
-        color: module.color,
-        wireframe: true,
-        transparent: true,
-        opacity: 0.5
-    });
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(module.position.x, module.position.y, module.position.z);
-    mesh.userData = { moduleIndex: index, module: module };
-    scene.add(mesh);
-
-    const glowGeometry = new THREE.IcosahedronGeometry(0.9, 2);
-    const glowMaterial = new THREE.MeshBasicMaterial({
-        color: module.color,
-        transparent: true,
-        opacity: 0.1,
-        side: THREE.BackSide
-    });
-    const glow = new THREE.Mesh(glowGeometry, glowMaterial);
-    mesh.add(glow);
-
-    const ringGeometry = new THREE.BufferGeometry();
-    const ringPositions = [];
-    for (let i = 0; i < 500; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const radius = 1.3 + Math.random() * 0.3;
-        ringPositions.push(
-            Math.cos(angle) * radius,
-            (Math.random() - 0.5) * 0.1,
-            Math.sin(angle) * radius
-        );
-    }
-    ringGeometry.setAttribute('position', new THREE.Float32BufferAttribute(ringPositions, 3));
-    const ringMaterial = new THREE.PointsMaterial({
-        color: module.color,
-        size: 0.05,
-        transparent: true,
-        opacity: 0.4,
-        blending: THREE.AdditiveBlending
-    });
-    const ring = new THREE.Points(ringGeometry, ringMaterial);
-    scene.add(ring);
-    ring.position.copy(mesh.position);
-
-    moduleObjects.push({ mesh, glow, ring, module });
-});
-
-/* ========================================
-   VARIÁVEIS DE ESTADO E ELEMENTOS UI
-======================================== */
 let spaceship = null;
 let isExperienceStarted = false;
 let isDragging = false;
@@ -147,10 +111,115 @@ const profileCardContainer = document.getElementById('profile-card-container');
 const profileOverlay = document.getElementById('profile-overlay');
 
 /* ========================================
+   CARREGAMENTO DE MODELOS GLB
+======================================== */
+
+// Verificar se GLTFLoader existe
+function checkGLTFLoader() {
+    if (typeof THREE.GLTFLoader === 'undefined') {
+        console.error('❌ THREE.GLTFLoader não encontrado!');
+        console.log('Verifique se você incluiu o script do GLTFLoader no HTML');
+        return false;
+    }
+    console.log('✓ THREE.GLTFLoader disponível');
+    return true;
+}
+
+// Criar loader
+const loader = checkGLTFLoader() ? new THREE.GLTFLoader() : null;
+
+// Função para carregar modelo GLB
+function loadGLBModel(module, index) {
+    if (!loader) {
+        console.error('❌ Loader não disponível, pulando:', module.name);
+        return Promise.reject('Loader não disponível');
+    }
+
+    const modelPath = MODEL_PATHS[module.name];
+    console.log(`\n🔄 [${module.name}] Carregando de: ${modelPath}`);
+
+    return new Promise((resolve, reject) => {
+        loader.load(
+            modelPath,
+            (gltf) => {
+                console.log(`✅ [${module.name}] MODELO CARREGADO COM SUCESSO!`);
+
+                const model = gltf.scene;
+
+                // Configurar escala personalizada para cada modelo
+                let scale = 0.08; // padrão
+                if (module.name === 'Formação') {
+                    scale = 0.04; // Earth menor
+                } else if (module.name === 'Experiências') {
+                    scale = 0.01; // Planet menor
+                } else if (module.name === 'Projetos') {
+                    scale = 0.20; // Zelda maior
+                }
+
+                model.scale.set(scale, scale, scale);
+                model.position.set(module.position.x, module.position.y, module.position.z);
+                model.userData = { moduleIndex: index, module: module };
+
+                // Configurar meshes internos
+                model.traverse((child) => {
+                    if (child.isMesh) {
+                        child.userData = { moduleIndex: index, module: module };
+                        console.log(`  ↳ Mesh configurado: ${child.name || 'unnamed'}`);
+                    }
+                });
+
+                scene.add(model);
+                console.log(`  ↳ Adicionado à cena`);
+
+                // Armazenar
+                moduleObjects.push({ mesh: model, module });
+                console.log(`✓ [${module.name}] Configuração completa!\n`);
+
+                resolve();
+            },
+            (xhr) => {
+                const percent = xhr.total > 0 ? (xhr.loaded / xhr.total * 100).toFixed(0) : '?';
+                console.log(`  ↳ Progresso: ${percent}%`);
+            },
+            (error) => {
+                console.error(`❌ [${module.name}] ERRO AO CARREGAR:`, error);
+                console.log(`  ↳ Caminho tentado: ${modelPath}`);
+                console.log(`  ↳ Verifique se o arquivo existe e o caminho está correto`);
+                reject(error);
+            }
+        );
+    });
+}
+
+// Inicializar carregamento de todos os modelos
+async function initModels() {
+    console.log('\n═══════════════════════════════════════');
+    console.log('🎬 INICIANDO CARREGAMENTO DOS MODELOS');
+    console.log('═══════════════════════════════════════\n');
+
+    try {
+        for (let i = 0; i < INDEX_MODULES.length; i++) {
+            await loadGLBModel(INDEX_MODULES[i], i);
+        }
+
+        console.log('\n═══════════════════════════════════════');
+        console.log('🎉 TODOS OS MODELOS FORAM CARREGADOS!');
+        console.log(`📊 Total de objetos na cena: ${moduleObjects.length}`);
+        console.log('═══════════════════════════════════════\n');
+    } catch (error) {
+        console.error('❌ Erro durante o carregamento:', error);
+    }
+}
+
+// Iniciar carregamento imediatamente
+initModels();
+
+/* ========================================
    FUNÇÕES DE CONTROLE
 ======================================== */
 function startExploration() {
-    if (isExperienceStarted) return; // Evita múltiplas chamadas
+    if (isExperienceStarted) return;
+    console.log('🚀 Iniciando exploração...');
 
     isExperienceStarted = true;
     profileCardContainer.classList.add('hidden');
@@ -162,6 +231,7 @@ function startExploration() {
 }
 
 function returnToCard() {
+    console.log('🔙 Retornando ao card...');
     isExperienceStarted = false;
     profileCardContainer.classList.remove('hidden');
     profileOverlay.classList.remove('hidden');
@@ -172,10 +242,9 @@ function returnToCard() {
     document.body.style.cursor = 'default';
 }
 
-// Escuta cliques nos botões de exploração (Frente e Verso)
 document.querySelectorAll('.explore-button').forEach(btn => {
     btn.addEventListener('click', (e) => {
-        e.stopPropagation(); // Impede o clique de passar para o canvas
+        e.stopPropagation();
         startExploration();
     });
 });
@@ -223,23 +292,39 @@ document.addEventListener('wheel', (e) => {
    NAVEGAÇÃO INTERPLANETÁRIA
 ======================================== */
 document.addEventListener('click', () => {
-    // Só processa cliques no cenário se a experiência começou
     if (isDragging || !isExperienceStarted) return;
 
     raycaster.setFromCamera(mouse, camera);
-    const intersects = raycaster.intersectObjects(moduleObjects.map(m => m.mesh));
+
+    const clickableMeshes = [];
+    moduleObjects.forEach(obj => {
+        if (obj.mesh.traverse) {
+            obj.mesh.traverse((child) => {
+                if (child.isMesh) {
+                    clickableMeshes.push(child);
+                }
+            });
+        } else if (obj.mesh.isMesh) {
+            clickableMeshes.push(obj.mesh);
+        }
+    });
+
+    const intersects = raycaster.intersectObjects(clickableMeshes, true);
 
     if (intersects.length > 0) {
-        const targetModule = intersects[0].object;
-        const module = targetModule.userData.module;
-        if (module.url) {
-            navigateToModule(targetModule, module.url);
+        const intersectedObject = intersects[0].object;
+        const module = intersectedObject.userData.module;
+        if (module && module.url) {
+            console.log(`🎯 Clicou em: ${module.name}`);
+            const targetMesh = moduleObjects[intersectedObject.userData.moduleIndex].mesh;
+            navigateToModule(targetMesh, module.url);
         }
     }
 });
 
 function navigateToModule(targetMesh, url) {
-    isExperienceStarted = false; // Trava interações durante a animação
+    console.log(`🚀 Navegando para: ${url}`);
+    isExperienceStarted = false;
     document.getElementById('info-panel').classList.remove('visible');
 
     const shipGeometry = new THREE.ConeGeometry(0.1, 0.3, 4);
@@ -286,13 +371,6 @@ function navigateToModule(targetMesh, url) {
             trail.geometry.attributes.position.needsUpdate = true;
         },
         onComplete: function () {
-            gsap.to(targetMesh.material, {
-                opacity: 1,
-                duration: 0.2,
-                yoyo: true,
-                repeat: 3
-            });
-
             setTimeout(() => {
                 gsap.to(document.body, {
                     opacity: 0,
@@ -313,7 +391,21 @@ function updateHover() {
     if (!isExperienceStarted) return;
 
     raycaster.setFromCamera(mouse, camera);
-    const intersects = raycaster.intersectObjects(moduleObjects.map(m => m.mesh));
+
+    const clickableMeshes = [];
+    moduleObjects.forEach(obj => {
+        if (obj.mesh.traverse) {
+            obj.mesh.traverse((child) => {
+                if (child.isMesh) {
+                    clickableMeshes.push(child);
+                }
+            });
+        } else if (obj.mesh.isMesh) {
+            clickableMeshes.push(obj.mesh);
+        }
+    });
+
+    const intersects = raycaster.intersectObjects(clickableMeshes, true);
 
     if (intersects.length > 0) {
         const moduleIndex = intersects[0].object.userData.moduleIndex;
@@ -342,7 +434,6 @@ function updateHover() {
 ======================================== */
 function animate() {
     if (!isExperienceStarted) {
-        // Efeito de inclinação suave no card baseado na rotação da cena
         profileCard.style.transform = `rotateY(${rotation.y * 10}deg) rotateX(${-rotation.x * 10}deg)`;
     }
 
@@ -351,20 +442,15 @@ function animate() {
 
     const time = Date.now() * 0.0001;
     moduleObjects.forEach((obj, i) => {
-        obj.mesh.rotation.y += 0.0015;
-        obj.mesh.rotation.x += 0.0005;
-        obj.ring.rotation.y += 0.002;
+        obj.mesh.rotation.y += 0.003;
+        obj.mesh.rotation.x += 0.0015;
 
-        const orbitSpeed = 0.1 + i * 0.05;
-        const driftX = Math.sin(time * orbitSpeed + i) * 0.003;
-        const driftY = Math.cos(time * orbitSpeed * 0.7 + i) * 0.003;
+        const orbitSpeed = 0.08 + i * 0.03;
+        const driftX = Math.sin(time * orbitSpeed + i) * 0.002;
+        const driftY = Math.cos(time * orbitSpeed * 0.7 + i) * 0.002;
 
         obj.mesh.position.x += driftX;
         obj.mesh.position.y += driftY;
-        obj.ring.position.copy(obj.mesh.position);
-
-        const pulse = Math.sin(Date.now() * 0.001 + i) * 0.1 + 1;
-        obj.glow.scale.set(pulse, pulse, pulse);
     });
 
     stars.rotation.y += 0.0002;
@@ -387,6 +473,10 @@ window.addEventListener('load', () => {
     gsap.to(document.body, { opacity: 1, duration: 1 });
 });
 
-// Inicialização
+/* ========================================
+   INICIALIZAÇÃO
+======================================== */
 document.body.style.opacity = '0';
 animate();
+
+console.log('✓ Sistema de animação iniciado');
